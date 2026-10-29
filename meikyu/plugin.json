@@ -1,0 +1,16 @@
+{
+  "name": "meikyu",
+  "kind": "feature",
+  "symbol": "FEATURE_meikyu",
+  "loadable": true,
+  "sequencer": true,
+  "author": "briannhinton",
+  "version": "0.3.0",
+  "sources": ["meikyu.c", "meikyu_core.c", "meikyu_screen.c"],
+  "cflags": ["-fno-tree-loop-distribute-patterns"],
+  "claims": [],
+  "screen": {
+    "svg": "meikyu.svg",
+    "symbol": "SCREEN_meikyu"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "toro",
+  "kind": "synth",
+  "order": 0,
+  "loadable": true,
+  "author": "briannhinton",
+  "version": "0.3.0",
+  "symbol": "ENGINE_toro",
+  "sources": ["toro.c", "toro_screen.c"],
+  "cflags": ["-fno-tree-loop-distribute-patterns"],
+  "screen": {
+    "svg": "toro.svg",
+    "symbol": "SCREEN_toro"
+  },
+  "defaults": [2000, 6000, 18000, 8000],
+  "page2_defaults": [0, 0, 6000],
+  "claims": []
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="320px" height="160px" viewBox="0 0 320 160">
+<path id="mat" fill="none" stroke="#3A3846" stroke-width="1.5" d="M228 136 C228 139.038 193.079 141.5 150 141.5 C106.921 141.5 72 139.038 72 136 C72 132.962 106.921 130.5 150 130.5 C193.079 130.5 228 132.962 228 136 Z"/>
+<circle id="shadow" fill="#16141D" cx="0" cy="0" r="1"/>
+<path id="hose" fill="none" stroke="#00ED95" stroke-width="1.5" d="M170 136 C200 142 236 138 256 131"/>
+<path id="hosend" fill="none" stroke="#625D77" stroke-width="1.5" d="M256 131 L261 131"/>
+<path id="base" fill="#24222E" stroke="#B9B9C9" stroke-width="1.5" d="M168.2 132 C168.2 133.74 160.052 135.15 150 135.15 C139.948 135.15 131.8 133.74 131.8 132 C131.8 130.26 139.948 128.85 150 128.85 C160.052 128.85 168.2 130.26 168.2 132 Z"/>
+<path id="cyl" fill="#24222E" stroke="#B9B9C9" stroke-width="1.5" d="M144.4 121.5 L155.6 121.5 L155.6 132 L144.4 132 Z"/>
+<path id="rod" fill="#00ED95" d="M-0.5 0 L0.5 0 L0.5 1 L-0.5 1 Z"/>
+<g id="rig">
+<path fill="#1F1D28" stroke="#B9B9C9" stroke-width="1.5" d="M-36 -40 C-26 -50 26 -50 36 -40 C47 -28 47 -8 34 -2 L-34 -2 C-47 -8 -47 -28 -36 -40 Z"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M-30 -44 C-40 -36 -42 -18 -34 -4"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M30 -44 C40 -36 42 -18 34 -4"/>
+<path fill="none" stroke="#B9B9C9" stroke-width="2" d="M-6 -52 C-6 -64 6 -64 6 -52"/>
+<path fill="#2B2836" stroke="#B9B9C9" stroke-width="1.5" d="M-29.25 -44.04 L-47.97 -42.87 L-51.48 -37.02 L-46.8 -32.34 L-29.25 -32.34 Z"/>
+<path fill="#2B2836" stroke="#B9B9C9" stroke-width="1.5" d="M29.25 -44.04 L47.97 -42.87 L51.48 -37.02 L46.8 -32.34 L29.25 -32.34 Z"/>
+<path fill="#2B2836" stroke="#B9B9C9" stroke-width="2" d="M-23.4 -55.74 L23.4 -55.74 L31.59 -41.7 L28.08 -25.32 L19.89 -11.28 L16.38 2.76 L9.36 7.44 L-9.36 7.44 L-16.38 2.76 L-19.89 -11.28 L-28.08 -25.32 L-31.59 -41.7 Z"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M-31.59 -41.7 L-11.7 -38.19"/>
+<path fill="#000000" d="M-24.57 -40.53 L-9.36 -36.084 L-9.36 -28.245 L-23.4 -32.106 Z"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M31.59 -41.7 L11.7 -38.19"/>
+<path fill="#000000" d="M24.57 -40.53 L9.36 -36.084 L9.36 -28.245 L23.4 -32.106 Z"/>
+<path fill="#1B1922" stroke="#B9B9C9" stroke-width="1.5" d="M-14.04 -14.79 L14.04 -14.79 L16.38 -1.92 L10.53 6.27 L-10.53 6.27 L-16.38 -1.92 Z"/>
+<path fill="#000000" d="M-4.095 -8.94 L-10.53 -8.94 L-9.36 -3.09 L-4.68 -3.09 Z"/>
+<path fill="#000000" d="M4.095 -8.94 L10.53 -8.94 L9.36 -3.09 L4.68 -3.09 Z"/>
+</g>
+</svg>

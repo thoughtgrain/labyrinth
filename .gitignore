@@ -1,0 +1,9 @@
+# build output and host test binaries
+build/
+*.knl
+*.o
+*.wasm
+*_test
+*_asan
+screen_host
+__pycache__/

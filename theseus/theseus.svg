@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="320px" height="160px" viewBox="0 0 320 160">
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M94 80 L94 132"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M87 140 L94 131 L101 140"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M232 69 L234 131"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M227 140 L234 130 L241 140"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M122 107 L122 131"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M115 140 L122 130 L129 140"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M197 120 L195 140"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M217 120 L219 140"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M143 126 L136 140"/>
+<path fill="none" stroke="#625D77" stroke-width="1.5" d="M177 126 L184 140"/>
+<path id="cuirass" fill="#1B1A22" stroke="#625D77" stroke-width="1.5" d="M141 95 C143 89 150 87 158 87 C166 87 173 89 175 95 L170 106 L146 106 Z"/>
+<path fill="#1B1A22" stroke="#B9B9C9" stroke-width="1.5" d="M108 98 L108 106 C108 108.209 114.268 110 122 110 C129.732 110 136 108.209 136 106 L136 98 C136 100.209 129.732 102 122 102 C114.268 102 108 100.209 108 98 Z"/>
+<path fill="#2A2735" stroke="#B9B9C9" stroke-width="1.5" d="M136 98 C136 100.209 129.732 102 122 102 C114.268 102 108 100.209 108 98 C108 95.791 114.268 94 122 94 C129.732 94 136 95.791 136 98 Z"/>
+<path fill="#1B1A22" stroke="#B9B9C9" stroke-width="1.5" d="M194 108 L194 124 C194 126.209 199.82 128 207 128 C214.18 128 220 126.209 220 124 L220 108 C220 110.209 214.18 112 207 112 C199.82 112 194 110.209 194 108 Z"/>
+<path fill="#2A2735" stroke="#B9B9C9" stroke-width="1.5" d="M220 108 C220 110.209 214.18 112 207 112 C199.82 112 194 110.209 194 108 C194 105.791 199.82 104 207 104 C214.18 104 220 105.791 220 108 Z"/>
+<path fill="#1B1A22" stroke="#B9B9C9" stroke-width="1.5" d="M179 88 L179 96 C179 97.933 183.925 99.5 190 99.5 C196.075 99.5 201 97.933 201 96 L201 88 C201 89.933 196.075 91.5 190 91.5 C183.925 91.5 179 89.933 179 88 Z"/>
+<path fill="#2A2735" stroke="#B9B9C9" stroke-width="1.5" d="M201 88 C201 89.933 196.075 91.5 190 91.5 C183.925 91.5 179 89.933 179 88 C179 86.067 183.925 84.5 190 84.5 C196.075 84.5 201 86.067 201 88 Z"/>
+<path fill="none" stroke="#B9B9C9" stroke-width="1.5" d="M176 99 L186 96"/>
+<path id="kick" fill="#1B1A22" stroke="#B9B9C9" stroke-width="2" d="M182 114 C182 126.151 172.151 136 160 136 C147.849 136 138 126.151 138 114 C138 101.849 147.849 92 160 92 C172.151 92 182 101.849 182 114 Z"/>
+<path fill="none" stroke="#625D77" stroke-width="1" d="M178.5 114 C178.5 124.218 170.218 132.5 160 132.5 C149.782 132.5 141.5 124.218 141.5 114 C141.5 103.782 149.782 95.5 160 95.5 C170.218 95.5 178.5 103.782 178.5 114 Z"/>
+</svg>

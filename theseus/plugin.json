@@ -1,0 +1,18 @@
+{
+  "name": "theseus",
+  "kind": "synth",
+  "order": 0,
+  "loadable": true,
+  "author": "briannhinton",
+  "version": "0.1.0",
+  "symbol": "ENGINE_theseus",
+  "sources": ["theseus.c", "theseus_screen.c"],
+  "cflags": ["-fno-tree-loop-distribute-patterns"],
+  "screen": {
+    "svg": "theseus.svg",
+    "symbol": "SCREEN_theseus"
+  },
+  "defaults": [9000, 14000, 16000, 8000],
+  "page2_defaults": [4000, 0, 16000],
+  "claims": []
+}
