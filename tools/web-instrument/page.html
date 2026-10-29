@@ -25,10 +25,9 @@ body { background: var(--bench); color: var(--ink); font: 400 12px/1.5 var(--mon
 .top a { color: inherit; }
 
 /* the instrument */
-.unit { background: linear-gradient(180deg, var(--body-hi), var(--body) 30%, #c2c3c6 100%); border-radius: 16px; padding: 18px;
-  box-shadow: inset 0 1px 0 #f2f2f3, inset 0 -2px 0 var(--body-lo), 0 18px 30px -18px rgba(0,0,0,.45); display: grid; gap: 16px; }
+.unit { background: var(--body); border-radius: 14px; padding: 18px; display: grid; gap: 16px; }
 .upper { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: center; }
-.screen { position: relative; background: #000; border-radius: 6px; padding: 7px; box-shadow: inset 0 0 0 2px #2a2a2d, 0 0 0 3px #b4b5b9; }
+.screen { position: relative; background: #000; border-radius: 4px; padding: 7px; }
 .screen .layer { position: relative; aspect-ratio: 2 / 1; }
 .screen svg, .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .toast { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); background: #fff; color: #000; font: 500 11px/1 var(--mono);
@@ -36,8 +35,8 @@ body { background: var(--bench); color: var(--ink); font: 400 12px/1.5 var(--mon
 .toast.on { opacity: 1; }
 .encs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; justify-items: center; }
 .enc { --c: var(--blue); width: min(72px, 100%); aspect-ratio: 1; border-radius: 50%; position: relative; cursor: grab; touch-action: none;
-  background: radial-gradient(circle at 50% 40%, #fbfbfb, #d9dadc 68%, #b9babd); box-shadow: 0 0 0 6px var(--c), 0 4px 7px rgba(0,0,0,.3); }
-.enc.w { box-shadow: 0 0 0 6px #fff, 0 0 0 7px #9a9ca1, 0 4px 7px rgba(0,0,0,.3); }
+  background: var(--c); }
+.enc.w { box-shadow: inset 0 0 0 1px #9a9ca1; }
 .enc::after { content: ""; position: absolute; left: 50%; top: 10%; width: 8%; height: 26%; margin-left: -4%; border-radius: 3px; background: var(--ink);
   transform-origin: 50% 154%; transform: rotate(var(--a, 0deg)); }
 .enc:active { cursor: grabbing; }
@@ -52,9 +51,10 @@ body { background: var(--bench); color: var(--ink); font: 400 12px/1.5 var(--mon
 /* function keys */
 .fkeys { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
 .fk { min-width: 64px; padding: 9px 10px 8px; border-radius: 6px; border: 0; cursor: pointer; text-align: left; display: grid; gap: 5px; touch-action: none;
-  background: linear-gradient(180deg, #f6f6f5, #e1e2df); box-shadow: inset 0 -2px 0 #b7b8b4, 0 1px 2px rgba(0,0,0,.25); color: var(--ink); font: 500 11px/1 var(--mono); text-transform: lowercase; }
+  background: var(--key); color: var(--ink); font: 500 11px/1 var(--mono); text-transform: lowercase; }
 .fk small { font-size: 9px; color: var(--ink-2); font-weight: 400; }
-.fk:active, .fk.down { transform: translateY(1px); box-shadow: inset 0 -1px 0 #b7b8b4; }
+.fk:active, .fk.down { background: var(--ink); color: var(--key); }
+.fk.down small { color: #aaa; }
 .fk .led { width: 7px; height: 7px; border-radius: 50%; background: #9c9d99; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
 .fk.on .led { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
 .fk.view .led { background: var(--green); box-shadow: 0 0 6px var(--green); }
@@ -65,14 +65,13 @@ body { background: var(--bench); color: var(--ink); font: 400 12px/1.5 var(--mon
 /* keyboard */
 .kb-wrap { overflow-x: auto; padding-bottom: 4px; }
 .kb { position: relative; height: 128px; min-width: 560px; display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; user-select: none; -webkit-user-select: none; touch-action: none; }
-.k { border: 0; border-radius: 0 0 6px 6px; background: linear-gradient(180deg, var(--key) 70%, #e7e7e4); box-shadow: inset 0 -3px 0 var(--key-lo), 0 1px 2px rgba(0,0,0,.25);
+.k { border: 0; border-radius: 0 0 4px 4px; background: var(--key);
   display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font: 400 9px/1 var(--mono); color: var(--ink-2); cursor: pointer; }
-.k.b { position: absolute; top: 0; height: 60%; z-index: 2; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #2b2b2e, var(--black)); color: #888;
-  box-shadow: inset 0 -3px 0 #000, 0 2px 3px rgba(0,0,0,.35); }
-.k.down { background: var(--orange); color: #fff; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25); }
+.k.b { position: absolute; top: 0; height: 60%; z-index: 2; border-radius: 0 0 3px 3px; background: var(--black); color: #888; }
+.k.down { background: var(--orange); color: #fff; }
 .k.b.down { background: var(--orange); }
 
-.help { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 24px; font-size: 11px; color: var(--ink-2); }
+.help { margin: 0; font-size: 11px; color: var(--ink-2); max-width: 80ch; }
 .help h2 { font: 600 15px/1 var(--sans); font-stretch: 85%; color: var(--ink); margin: 0 0 6px; text-transform: lowercase; }
 .help p { margin: 0; }
 kbd { font: 500 10px var(--mono); background: var(--bench-2); padding: 1px 4px; border-radius: 3px; color: var(--ink); }
@@ -106,29 +105,19 @@ kbd { font: 500 10px var(--mono); background: var(--bench-2); padding: 1px 4px; 
       <div>
         <div class="encs" id="encs"></div>
         <div class="enclabels" id="enclabels" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-        <div class="status" aria-live="polite"><span id="st-toro"><i></i>toro</span><span id="st-theseus"><i></i>theseus</span><span>·</span><span id="st-synth"><i></i>synth view</span><span id="st-seq"><i></i>sequencer view</span><span>· drag or scroll to turn, tap to press</span></div>
       </div>
     </div>
 
     <div class="fkeys" role="group" aria-label="function keys">
       <button class="fk" id="k-shift" aria-pressed="false"><span class="led"></span>shift<small>hold</small></button>
       <button class="fk view" id="k-synth"><span class="led"></span>synth<small>again: engine</small></button>
-      <button class="fk on" id="k-seq"><span class="led"></span>sequencer<small>shift: on / off</small></button>
-      <button class="fk" id="k-play"><span class="led"></span>play<small>latch / stop</small></button>
-      <button class="fk" id="k-octd"><span class="led" style="visibility:hidden"></span>oct −<small id="oct-l">c2</small></button>
-      <button class="fk" id="k-octu"><span class="led" style="visibility:hidden"></span>oct +<small>&nbsp;</small></button>
-      <span class="spacer"></span>
-      <label class="tempo" for="bpm">tempo<input id="bpm" type="number" min="40" max="240" value="112"></label>
+      <button class="fk" id="k-seq"><span class="led"></span>sequencer<small>&nbsp;</small></button>
     </div>
 
     <div class="kb-wrap"><div class="kb" id="kb" aria-label="keyboard, two octaves"></div></div>
   </div>
 
-  <div class="help">
-    <div><h2>synth</h2><p>shows the loaded engine. press it again to swap toro and theseus. turn the encoders to play the sound; tap blue, green or white for page 2.</p></div>
-    <div><h2>sequencer</h2><p>shows meikyu. hold a key to play the pattern from it; <kbd>shift</kbd> + key or <b>play</b> keeps it going. on this screen the encoders are corr, len, dens, rng; shift for rate, gate, scl, hold; tap orange for the mod page.</p></div>
-    <div><h2>keys</h2><p><kbd>z</kbd>–<kbd>m</kbd> and <kbd>q</kbd>–<kbd>i</kbd> play the two octaves; hold <kbd>shift</kbd> for shift. turn the sequencer off (shift + sequencer) to play notes straight into the engine.</p></div>
-  </div>
+  <p class="help">synth shows the sound (press again to swap toro and theseus). sequencer shows meikyu. hold a key to play the pattern from it, shift + key keeps it going, any key alone stops it. drag or scroll an encoder to turn it, tap to press. keys <kbd>z</kbd>–<kbd>m</kbd>, <kbd>q</kbd>–<kbd>u</kbd>.</p>
 </div>
 
 <script>
@@ -206,7 +195,6 @@ function syncLabels() {
     else t = (i < 3 && (page[e] >> i) & 1) ? [["shap", "nois", "driv/aphx"], ["nois", "lfo", "rate"]][e][i] : ENC_NAME[e][i];
     if (spans[i].textContent !== t) spans[i].textContent = t;
   }
-  for (const [id, on] of [["st-toro", e === 0], ["st-theseus", e === 1], ["st-synth", view === 0], ["st-seq", view === 1]]) $(id).classList.toggle("on", on);
 }
 function syncEnc(i) {
   const el = encEls[i];
@@ -260,20 +248,7 @@ function buildKeys() {
     if (view !== 0) { setView(0); toast(ENG_NAMES[ex.engine()]); return; }
     ex.set_engine(ex.engine() ^ 1); setView(0); toast(ENG_NAMES[ex.engine()]);
   });
-  $("k-seq").addEventListener("click", () => {
-    startAudio();
-    if (shift) { const on = !ex.seq(); ex.set_seq(on ? 1 : 0); $("k-seq").classList.toggle("on", on); toast(on ? "meikyu on" : "meikyu off: keys play the engine"); return; }
-    setView(1); toast(ex.seq() ? "meikyu" : "meikyu (off)");
-  });
-  $("k-play").addEventListener("click", () => {
-    startAudio();
-    if (ex.seq_running()) { ex.seq_stop(); $("k-play").classList.remove("on"); return; }
-    if (!ex.seq()) { ex.set_seq(1); $("k-seq").classList.add("on"); }
-    ex.key_down(36 + 12 * octave + lastKey, lastKey, 1); ex.key_up(lastKey, 1); $("k-play").classList.add("on");
-  });
-  $("k-octd").addEventListener("click", () => { octave = Math.max(-2, octave - 1); $("oct-l").textContent = "c" + (2 + octave); });
-  $("k-octu").addEventListener("click", () => { octave = Math.min(2, octave + 1); $("oct-l").textContent = "c" + (2 + octave); });
-  $("bpm").addEventListener("change", ev => { const v = Math.max(40, Math.min(240, +ev.target.value || 112)); ev.target.value = v; ex.set_bpm(v); });
+  $("k-seq").addEventListener("click", () => { startAudio(); setView(1); toast("meikyu"); });
 }
 
 /* ---- keyboard: two octaves from c ---- */
@@ -283,7 +258,6 @@ function keyDown(k) {
   if (keyEls[k].classList.contains("down")) return;
   startAudio(); lastKey = k; keyEls[k].classList.add("down");
   ex.key_down(36 + 12 * octave + k, k, shift ? 1 : 0);
-  if (shift && ex.seq()) $("k-play").classList.add("on");
 }
 function keyUp(k) { if (!keyEls[k].classList.contains("down")) return; keyEls[k].classList.remove("down"); ex.key_up(k, shift ? 1 : 0); }
 function buildKeyboard() {
@@ -332,7 +306,6 @@ WebAssembly.instantiate(b64(WASM_B64), { env }).then(({ instance }) => {
   const loop = now => {
     const dt = Math.max(1, Math.min(100, Math.round(now - last))); last = now;
     draw(dt); syncLabels();
-    if (!ex.seq_running()) $("k-play").classList.remove("on");
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
