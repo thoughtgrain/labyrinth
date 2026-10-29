@@ -1,0 +1,340 @@
+<title>Labyrinth Instrument</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one original instrument on a pale bench. A slab with a black screen and four coloured encoders on top,
+   a row of labelled function keys, then a two-octave keyboard. One committed look in both host themes. */
+:root {
+  --bench: #e6e6e3; --bench-2: #d6d6d2;
+  --body: #c9cacc; --body-hi: #dfe0e2; --body-lo: #a9abaf;
+  --ink: #111; --ink-2: #5e5f63;
+  --key: #f4f4f2; --key-lo: #cfd0cc; --black: #1b1b1d;
+  --blue: #698eff; --green: #00ed95; --white: #ffffff; --orange: #ff423f;
+  --sans: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bench); color: var(--ink); font: 400 12px/1.5 var(--mono); -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; font-size: 11px; text-transform: lowercase; color: var(--ink-2); }
+.top b { color: var(--ink); font-weight: 500; }
+.top a { color: inherit; }
+
+/* the instrument */
+.unit { background: linear-gradient(180deg, var(--body-hi), var(--body) 30%, #c2c3c6 100%); border-radius: 16px; padding: 18px;
+  box-shadow: inset 0 1px 0 #f2f2f3, inset 0 -2px 0 var(--body-lo), 0 18px 30px -18px rgba(0,0,0,.45); display: grid; gap: 16px; }
+.upper { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: center; }
+.screen { position: relative; background: #000; border-radius: 6px; padding: 7px; box-shadow: inset 0 0 0 2px #2a2a2d, 0 0 0 3px #b4b5b9; }
+.screen .layer { position: relative; aspect-ratio: 2 / 1; }
+.screen svg, .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.toast { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); background: #fff; color: #000; font: 500 11px/1 var(--mono);
+  padding: 5px 9px; border-radius: 3px; opacity: 0; transition: opacity .15s; pointer-events: none; text-transform: lowercase; }
+.toast.on { opacity: 1; }
+.encs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; justify-items: center; }
+.enc { --c: var(--blue); width: min(72px, 100%); aspect-ratio: 1; border-radius: 50%; position: relative; cursor: grab; touch-action: none;
+  background: radial-gradient(circle at 50% 40%, #fbfbfb, #d9dadc 68%, #b9babd); box-shadow: 0 0 0 6px var(--c), 0 4px 7px rgba(0,0,0,.3); }
+.enc.w { box-shadow: 0 0 0 6px #fff, 0 0 0 7px #9a9ca1, 0 4px 7px rgba(0,0,0,.3); }
+.enc::after { content: ""; position: absolute; left: 50%; top: 10%; width: 8%; height: 26%; margin-left: -4%; border-radius: 3px; background: var(--ink);
+  transform-origin: 50% 154%; transform: rotate(var(--a, 0deg)); }
+.enc:active { cursor: grabbing; }
+.enc:focus-visible, .fk:focus-visible, .k:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.enclabels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; text-align: center; font: 500 11px/1.2 var(--mono); color: var(--ink); text-transform: lowercase; margin-top: 14px; }
+.status { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--body-lo); font-size: 10px; color: var(--ink-2); text-transform: lowercase; justify-content: center; }
+.status span { display: inline-flex; gap: 6px; align-items: center; }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: #9c9d99; display: inline-block; }
+.status .on i { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.status .on { color: var(--ink); }
+
+/* function keys */
+.fkeys { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.fk { min-width: 64px; padding: 9px 10px 8px; border-radius: 6px; border: 0; cursor: pointer; text-align: left; display: grid; gap: 5px; touch-action: none;
+  background: linear-gradient(180deg, #f6f6f5, #e1e2df); box-shadow: inset 0 -2px 0 #b7b8b4, 0 1px 2px rgba(0,0,0,.25); color: var(--ink); font: 500 11px/1 var(--mono); text-transform: lowercase; }
+.fk small { font-size: 9px; color: var(--ink-2); font-weight: 400; }
+.fk:active, .fk.down { transform: translateY(1px); box-shadow: inset 0 -1px 0 #b7b8b4; }
+.fk .led { width: 7px; height: 7px; border-radius: 50%; background: #9c9d99; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
+.fk.on .led { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+.fk.view .led { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.tempo { display: grid; gap: 4px; font-size: 9px; color: var(--ink-2); text-transform: lowercase; padding: 4px 6px; }
+.tempo input { width: 64px; font: 500 13px var(--mono); padding: 4px 6px; border: 0; border-radius: 4px; background: #111; color: var(--green); }
+.spacer { flex: 1; }
+
+/* keyboard */
+.kb-wrap { overflow-x: auto; padding-bottom: 4px; }
+.kb { position: relative; height: 128px; min-width: 560px; display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; user-select: none; -webkit-user-select: none; touch-action: none; }
+.k { border: 0; border-radius: 0 0 6px 6px; background: linear-gradient(180deg, var(--key) 70%, #e7e7e4); box-shadow: inset 0 -3px 0 var(--key-lo), 0 1px 2px rgba(0,0,0,.25);
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font: 400 9px/1 var(--mono); color: var(--ink-2); cursor: pointer; }
+.k.b { position: absolute; top: 0; height: 60%; z-index: 2; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #2b2b2e, var(--black)); color: #888;
+  box-shadow: inset 0 -3px 0 #000, 0 2px 3px rgba(0,0,0,.35); }
+.k.down { background: var(--orange); color: #fff; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25); }
+.k.b.down { background: var(--orange); }
+
+.help { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 24px; font-size: 11px; color: var(--ink-2); }
+.help h2 { font: 600 15px/1 var(--sans); font-stretch: 85%; color: var(--ink); margin: 0 0 6px; text-transform: lowercase; }
+.help p { margin: 0; }
+kbd { font: 500 10px var(--mono); background: var(--bench-2); padding: 1px 4px; border-radius: 3px; color: var(--ink); }
+.start { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.55); border: 0; color: #fff; font: 500 12px var(--mono);
+  cursor: pointer; text-transform: lowercase; border-radius: 4px; }
+.start span { border: 1px solid #fff; padding: 8px 14px; border-radius: 999px; }
+
+@media (max-width: 760px) {
+  .upper { grid-template-columns: minmax(0, 1fr); }
+  .enc { width: min(60px, 100%); }
+  .fk { min-width: 56px; }
+}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <span><b>labyrinth</b> / meikyu + toro + theseus / the plugins' own c code in your browser</span>
+    <a href="https://github.com/thoughtgrain/labyrinth">source on github</a>
+  </div>
+
+  <div class="unit" id="unit">
+    <div class="upper">
+      <div class="screen">
+        <div class="layer" id="layer">
+          <div id="art-toro"></div><div id="art-theseus" hidden></div><div id="art-meikyu" hidden></div>
+          <canvas id="cv" width="960" height="480" role="img" aria-label="instrument screen"></canvas>
+          <button class="start" id="start"><span>tap to start sound</span></button>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+      <div>
+        <div class="encs" id="encs"></div>
+        <div class="enclabels" id="enclabels" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div class="status" aria-live="polite"><span id="st-toro"><i></i>toro</span><span id="st-theseus"><i></i>theseus</span><span>·</span><span id="st-synth"><i></i>synth view</span><span id="st-seq"><i></i>sequencer view</span><span>· drag or scroll to turn, tap to press</span></div>
+      </div>
+    </div>
+
+    <div class="fkeys" role="group" aria-label="function keys">
+      <button class="fk" id="k-shift" aria-pressed="false"><span class="led"></span>shift<small>hold</small></button>
+      <button class="fk view" id="k-synth"><span class="led"></span>synth<small>again: engine</small></button>
+      <button class="fk on" id="k-seq"><span class="led"></span>sequencer<small>shift: on / off</small></button>
+      <button class="fk" id="k-play"><span class="led"></span>play<small>latch / stop</small></button>
+      <button class="fk" id="k-octd"><span class="led" style="visibility:hidden"></span>oct −<small id="oct-l">c2</small></button>
+      <button class="fk" id="k-octu"><span class="led" style="visibility:hidden"></span>oct +<small>&nbsp;</small></button>
+      <span class="spacer"></span>
+      <label class="tempo" for="bpm">tempo<input id="bpm" type="number" min="40" max="240" value="112"></label>
+    </div>
+
+    <div class="kb-wrap"><div class="kb" id="kb" aria-label="keyboard, two octaves"></div></div>
+  </div>
+
+  <div class="help">
+    <div><h2>synth</h2><p>shows the loaded engine. press it again to swap toro and theseus. turn the encoders to play the sound; tap blue, green or white for page 2.</p></div>
+    <div><h2>sequencer</h2><p>shows meikyu. hold a key to play the pattern from it; <kbd>shift</kbd> + key or <b>play</b> keeps it going. on this screen the encoders are corr, len, dens, rng; shift for rate, gate, scl, hold; tap orange for the mod page.</p></div>
+    <div><h2>keys</h2><p><kbd>z</kbd>–<kbd>m</kbd> and <kbd>q</kbd>–<kbd>i</kbd> play the two octaves; hold <kbd>shift</kbd> for shift. turn the sequencer off (shift + sequencer) to play notes straight into the engine.</p></div>
+  </div>
+</div>
+
+<script>
+const WASM_B64 = "%%WASM%%";
+const ART = { toro: `%%SVG_TORO%%`, theseus: `%%SVG_THESEUS%%`, meikyu: `%%SVG_MEIKYU%%` };
+const ENG_NAMES = ["toro", "theseus"];
+const ENC_COL = ["var(--blue)", "var(--green)", "var(--white)", "var(--orange)"];
+const ENC_NAME = [["sprd", "fold", "cut", "res"], ["dcy", "pnch", "cut", "fm"]];
+let ex, view = 0, shift = false, page = [0, 0], octave = 0, actx = null, lastKey = 0;
+
+const lines = [];
+const nodeEl = {};
+const env = {
+  js_line: (x1, y1, x2, y2, w, rgb) => { lines.push(x1, y1, x2, y2, w, rgb); },
+  js_node: (id, a, b, c, d, e, f) => { const el = nodeEl[id]; if (el) el.setAttribute("transform", `matrix(${a} ${b} ${c} ${d} ${e} ${f})`); },
+  js_sin: Math.sin,
+};
+function b64(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+
+/* ---- screen: the plugin's static svg underneath, the lines its code draws on a canvas above ---- */
+for (const k of Object.keys(ART)) document.getElementById("art-" + k).innerHTML = ART[k];
+for (const svg of document.querySelectorAll(".layer svg")) { svg.removeAttribute("width"); svg.removeAttribute("height"); svg.setAttribute("aria-hidden", "true"); }
+nodeEl[1] = document.querySelector("#art-toro #rig"); nodeEl[2] = document.querySelector("#art-toro #rod"); nodeEl[3] = document.querySelector("#art-toro #shadow");
+const cv = document.getElementById("cv"), g = cv.getContext("2d");
+function showArt() {
+  const which = view === 1 ? "meikyu" : ENG_NAMES[ex.engine()];
+  for (const k of Object.keys(ART)) document.getElementById("art-" + k).hidden = k !== which;
+}
+function draw(dt) {
+  lines.length = 0;
+  ex.frame(view, dt, page[ex.engine()], shift ? 1 : 0);
+  const s = cv.width / 320;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+  g.setTransform(s, 0, 0, s, 0, 0); g.lineCap = "round";
+  let last = -1;
+  for (let i = 0; i < lines.length; i += 6) {
+    if (lines[i + 5] !== last) { last = lines[i + 5]; g.strokeStyle = "#" + last.toString(16).padStart(6, "0"); }
+    g.lineWidth = lines[i + 4];
+    g.beginPath(); g.moveTo(lines[i], lines[i + 1]); g.lineTo(lines[i + 2], lines[i + 3]); g.stroke();
+  }
+}
+let toastT = 0;
+function toast(t) { const el = document.getElementById("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 1100); }
+
+/* ---- audio: meikyu clocks the engine 1024 samples at a time ---- */
+function startAudio() {
+  document.getElementById("start").hidden = true;
+  if (actx) { actx.resume(); return; }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  try { actx = new AC({ sampleRate: 44100 }); } catch (e) { actx = new AC(); }
+  const node = actx.createScriptProcessor(1024, 0, 1);
+  node.onaudioprocess = ev => { ex.run(8); ev.outputBuffer.getChannelData(0).set(new Float32Array(ex.memory.buffer, ex.audio_buf(), 1024)); };
+  node.connect(actx.destination);
+}
+
+/* ---- encoders: drag or scroll turns; a tap presses. On the synth screen they edit the engine (tap = page 2 for
+   blue, green, white); on the sequencer screen they go to meikyu as turns and presses, with shift ---- */
+const encEls = [];
+function pIndex(i) { const e = ex.engine(); return i < 3 && (page[e] >> i) & 1 ? 5 + i : i; }
+function turn(i, detents) {
+  if (view === 1) ex.seq_turn(i, detents * 1024, shift ? 1 : 0);
+  else { const pi = pIndex(i); ex.set_param(pi, ex.get_param(pi) + detents * 820); }
+  syncEnc(i);
+}
+function press(i) {
+  if (view === 1) { ex.seq_press(i, shift ? 1 : 0); return; }
+  if (i < 3) { const e = ex.engine(); page[e] ^= 1 << i; syncEnc(i); }
+}
+const SEQ_NAMES = [["corr", "len", "dens", "rng"], ["rate", "gate", "scl", "hold"]];
+function syncLabels() {
+  const spans = document.querySelectorAll("#enclabels span"), e = ex.engine();
+  for (let i = 0; i < 4; i++) {
+    let t;
+    if (view === 1) t = SEQ_NAMES[shift ? 1 : 0][i];
+    else t = (i < 3 && (page[e] >> i) & 1) ? [["shap", "nois", "driv/aphx"], ["nois", "lfo", "rate"]][e][i] : ENC_NAME[e][i];
+    if (spans[i].textContent !== t) spans[i].textContent = t;
+  }
+  for (const [id, on] of [["st-toro", e === 0], ["st-theseus", e === 1], ["st-synth", view === 0], ["st-seq", view === 1]]) $(id).classList.toggle("on", on);
+}
+function syncEnc(i) {
+  const el = encEls[i];
+  if (view === 1) { el.style.setProperty("--a", ((+el.dataset.spin || 0) * 24) + "deg"); el.setAttribute("aria-label", ["blue", "green", "white", "orange"][i] + " encoder, meikyu"); return; }
+  const v = ex.get_param(pIndex(i));
+  el.style.setProperty("--a", (-135 + 270 * v / 32767) + "deg");
+  el.setAttribute("aria-label", ENC_NAME[ex.engine()][i] + " encoder, " + Math.round(v * 99 / 32767));
+}
+function buildEncoders() {
+  const host = document.getElementById("encs");
+  for (let i = 0; i < 4; i++) {
+    const el = document.createElement("div"); el.className = "enc" + (i === 2 ? " w" : ""); el.style.setProperty("--c", ENC_COL[i]);
+    el.tabIndex = 0; el.setAttribute("role", "button");
+    el.title = "drag up or down to turn, tap to press";
+    let y0 = null, acc = 0, moved = 0;
+    el.addEventListener("pointerdown", ev => { startAudio(); y0 = ev.clientY; acc = 0; moved = 0; el.setPointerCapture(ev.pointerId); });
+    el.addEventListener("pointermove", ev => {
+      if (y0 === null) return;
+      const d = y0 - ev.clientY; y0 = ev.clientY; acc += d; moved += Math.abs(d);
+      const step = view === 1 ? 7 : 3;
+      while (Math.abs(acc) >= step) { const s = Math.sign(acc); turn(i, s); el.dataset.spin = (+el.dataset.spin || 0) + s; acc -= s * step; }
+    });
+    el.addEventListener("pointerup", () => { if (y0 !== null && moved < 4) press(i); y0 = null; });
+    el.addEventListener("pointercancel", () => { y0 = null; });
+    el.addEventListener("wheel", ev => { ev.preventDefault(); const s = ev.deltaY < 0 ? 1 : -1; turn(i, s); el.dataset.spin = (+el.dataset.spin || 0) + s; }, { passive: false });
+    el.addEventListener("keydown", ev => {
+      if (ev.key === "ArrowUp" || ev.key === "ArrowRight") { ev.preventDefault(); turn(i, 1); }
+      else if (ev.key === "ArrowDown" || ev.key === "ArrowLeft") { ev.preventDefault(); turn(i, -1); }
+      else if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); press(i); }
+    });
+    host.append(el); encEls.push(el);
+  }
+}
+
+/* ---- function keys ---- */
+const $ = id => document.getElementById(id);
+function setShift(on) { shift = on; if (ex) syncLabels(); $("k-shift").classList.toggle("down", on); $("k-shift").setAttribute("aria-pressed", String(on)); }
+function setView(v) {
+  view = v; showArt();
+  $("k-synth").classList.toggle("view", v === 0); $("k-seq").classList.toggle("view", v === 1);
+  for (let i = 0; i < 4; i++) syncEnc(i);
+}
+function buildKeys() {
+  const sk = $("k-shift");
+  sk.addEventListener("pointerdown", ev => { ev.preventDefault(); startAudio(); setShift(true); sk.setPointerCapture(ev.pointerId); });
+  sk.addEventListener("pointerup", () => setShift(false));
+  sk.addEventListener("pointercancel", () => setShift(false));
+  sk.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setShift(!shift); } });
+  $("k-synth").addEventListener("click", () => {
+    startAudio();
+    if (view !== 0) { setView(0); toast(ENG_NAMES[ex.engine()]); return; }
+    ex.set_engine(ex.engine() ^ 1); setView(0); toast(ENG_NAMES[ex.engine()]);
+  });
+  $("k-seq").addEventListener("click", () => {
+    startAudio();
+    if (shift) { const on = !ex.seq(); ex.set_seq(on ? 1 : 0); $("k-seq").classList.toggle("on", on); toast(on ? "meikyu on" : "meikyu off: keys play the engine"); return; }
+    setView(1); toast(ex.seq() ? "meikyu" : "meikyu (off)");
+  });
+  $("k-play").addEventListener("click", () => {
+    startAudio();
+    if (ex.seq_running()) { ex.seq_stop(); $("k-play").classList.remove("on"); return; }
+    if (!ex.seq()) { ex.set_seq(1); $("k-seq").classList.add("on"); }
+    ex.key_down(36 + 12 * octave + lastKey, lastKey, 1); ex.key_up(lastKey, 1); $("k-play").classList.add("on");
+  });
+  $("k-octd").addEventListener("click", () => { octave = Math.max(-2, octave - 1); $("oct-l").textContent = "c" + (2 + octave); });
+  $("k-octu").addEventListener("click", () => { octave = Math.min(2, octave + 1); $("oct-l").textContent = "c" + (2 + octave); });
+  $("bpm").addEventListener("change", ev => { const v = Math.max(40, Math.min(240, +ev.target.value || 112)); ev.target.value = v; ex.set_bpm(v); });
+}
+
+/* ---- keyboard: two octaves from c ---- */
+const keyEls = [], downBy = new Map();
+const NAMES = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
+function keyDown(k) {
+  if (keyEls[k].classList.contains("down")) return;
+  startAudio(); lastKey = k; keyEls[k].classList.add("down");
+  ex.key_down(36 + 12 * octave + k, k, shift ? 1 : 0);
+  if (shift && ex.seq()) $("k-play").classList.add("on");
+}
+function keyUp(k) { if (!keyEls[k].classList.contains("down")) return; keyEls[k].classList.remove("down"); ex.key_up(k, shift ? 1 : 0); }
+function buildKeyboard() {
+  const kb = $("kb");
+  const whites = [], blacks = [];
+  for (let k = 0; k < 24; k++) (([1, 3, 6, 8, 10].includes(k % 12)) ? blacks : whites).push(k);
+  whites.forEach((k, col) => {
+    const el = document.createElement("button"); el.className = "k"; el.style.gridColumn = String(col + 1);
+    el.textContent = k % 12 === 0 ? "c" + (2 + Math.floor(k / 12)) : ""; el.setAttribute("aria-label", NAMES[k % 12] + " key " + (k + 1));
+    kb.append(el); keyEls[k] = el;
+  });
+  for (const k of blacks) {
+    const el = document.createElement("button"); el.className = "k b"; el.setAttribute("aria-label", NAMES[k % 12] + " key " + (k + 1));
+    const w = whites.filter(x => x < k).length;                       /* the white keys before it */
+    el.style.left = `calc(${w} * ((100% - 52px) / 14 + 4px) - 2px - ((100% - 52px) / 14) * 0.31)`; el.style.width = `calc(((100% - 52px) / 14) * 0.62)`;
+    kb.append(el); keyEls[k] = el;
+  }
+  keyEls.forEach((el, k) => {
+    el.addEventListener("pointerdown", ev => { ev.preventDefault(); downBy.set(ev.pointerId, k); keyDown(k); });
+    el.addEventListener("pointerenter", ev => { if (ev.buttons && downBy.has(ev.pointerId)) { keyUp(downBy.get(ev.pointerId)); downBy.set(ev.pointerId, k); keyDown(k); } });
+    el.addEventListener("keydown", ev => { if ((ev.key === "Enter" || ev.key === " ") && !ev.repeat) { ev.preventDefault(); keyDown(k); } });
+    el.addEventListener("keyup", ev => { if (ev.key === "Enter" || ev.key === " ") keyUp(k); });
+  });
+  const release = ev => { if (downBy.has(ev.pointerId)) { keyUp(downBy.get(ev.pointerId)); downBy.delete(ev.pointerId); } };
+  window.addEventListener("pointerup", release); window.addEventListener("pointercancel", release);
+  /* computer keys: z..m lower octave, q..i upper */
+  const MAP = { KeyZ: 0, KeyS: 1, KeyX: 2, KeyD: 3, KeyC: 4, KeyV: 5, KeyG: 6, KeyB: 7, KeyH: 8, KeyN: 9, KeyJ: 10, KeyM: 11,
+                KeyQ: 12, Digit2: 13, KeyW: 14, Digit3: 15, KeyE: 16, KeyR: 17, Digit5: 18, KeyT: 19, Digit6: 20, KeyY: 21, Digit7: 22, KeyU: 23 };
+  window.addEventListener("keydown", ev => {
+    if (ev.target.closest && ev.target.closest("input")) return;
+    if (ev.key === "Shift") { setShift(true); return; }
+    const k = MAP[ev.code]; if (k !== undefined && !ev.repeat && !ev.metaKey && !ev.ctrlKey) { ev.preventDefault(); keyDown(k); }
+  });
+  window.addEventListener("keyup", ev => {
+    if (ev.key === "Shift") { setShift(false); return; }
+    const k = MAP[ev.code]; if (k !== undefined) keyUp(k);
+  });
+  window.addEventListener("blur", () => { setShift(false); keyEls.forEach((_, k) => keyUp(k)); });
+}
+
+WebAssembly.instantiate(b64(WASM_B64), { env }).then(({ instance }) => {
+  ex = instance.exports; ex.init();
+  buildEncoders(); buildKeys(); buildKeyboard(); setView(0);
+  $("start").addEventListener("click", startAudio);
+  let last = performance.now();
+  const loop = now => {
+    const dt = Math.max(1, Math.min(100, Math.round(now - last))); last = now;
+    draw(dt); syncLabels();
+    if (!ex.seq_running()) $("k-play").classList.remove("on");
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+}).catch(err => { document.querySelector(".top span").textContent = "this browser could not start the webassembly module: " + err.message; });
+</script>
