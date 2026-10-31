@@ -4,7 +4,7 @@ This folder is my port of two of the three labyrinth plugins to the teenage engi
 
 - **toro**: the two-oscillator wavefolder synth, with APHX.
 - **theseus**: the DFAM-style percussion voice.
-- **meikyu** is not here yet. See [What about meikyu?](#what-about-meikyu) for why, and what the plan is.
+- **meikyu**: the shift register as a note player (phrase mode), against the SDK's unmerged `firmware/native-players` branch. See [What about meikyu?](#what-about-meikyu).
 
 ![toro on the XY: the rider at rest](docs/toro_rest.png)
 
@@ -85,13 +85,16 @@ If you change the artwork, regenerate it: `python3 gen_panel.py > panel.svg.frag
 | `sdk.py test` on both: preview ABI, memory, peak bounds, every frame valid | passed |
 | CPU estimate (host-timed, not the device) | toro about 9–11 k, theseus about 13–15 k instructions per voice block at the heaviest setting; the aim is 15 k |
 | Screens in the SDK's browser workbench | checked |
+| meikyu player: host test against the `firmware/native-players` branch | passed; not yet heard on hardware |
 | Firmware build and the OP-XY itself | **not done**: no Blackfin+ toolchain or XY here. The catalog also needs a hardware CPU measurement (`docs/profiling.md` in the SDK) |
 
 theseus is the one to measure first: at its heaviest setting (full FM and noise, a long decay) the estimate sits at the aim. If the device says it is over, the noise mix and the FM index are the two things to make cheaper.
 
 ## What about meikyu?
 
-The OP-XY has no sequencer plugins. The SDK offers synths, sample engines and effects, plus "extensions" that observe firmware events, and the two events a sequencer would need (a pattern step playing, notes reaching a track) are listed as not exposed. The right home for meikyu on the XY is a **player**, the XY's own note-effect stage (arpeggio, maestro, hold), which the SDK doesn't support yet. Adding that means mapping the stock players in the firmware and adding a player type to the SDK, which needs the firmware file from a device and hardware to test on. That is the next step, separate from this port.
+The OP-XY has no sequencer plugins. The SDK offers synths, sample engines and effects, plus "extensions" that observe firmware events, and the two events a sequencer would need (a pattern step playing, notes reaching a track) are listed as not exposed. The right home for meikyu on the XY is a **player**, the XY's own note-effect stage (arpeggio, maestro, hold).
+
+The SDK's author has that in progress: the `firmware/native-players` branch of `etcetc000/open-xy` (SDK 1.7 draft, six hooks into the stock Maestro object, a `<opxy/player.hpp>` API) with a Chords player as the example in `open-xy-core-machines`. A player answers key presses with a plan of up to eight timed tones; it has no clock and can't sound a note on its own. So `machines/meikyu/` is meikyu as a **phrase player**: every note, live or sequenced, plays the next eight steps of the self-corrupting register, rooted on that note, and the pattern drifts across the bar. Its [README](machines/meikyu/README.md) has the controls and what's missing against the OP-1. It passes the branch's `sdk.py test` on the host and is waiting on a firmware build to be heard; the branch is unmerged, so the API may still move under it.
 
 ## Licence
 

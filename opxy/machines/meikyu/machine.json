@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "kind": "player",
+  "description": "A generative shift-register phrase player: every note plays the next eight steps of a self-corrupting pattern, quantized to a scale or spread over drum pads.",
+  "sdk": "1.7"
+}

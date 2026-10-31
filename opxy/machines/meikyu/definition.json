@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "meikyu",
+  "name": "Meikyu",
+  "parameters": [
+    {
+      "id": "density",
+      "label": "Dens",
+      "default": 0.6,
+      "mapping": { "kind": "linear", "minimum": 0, "maximum": 100 },
+      "display": "percent"
+    },
+    {
+      "id": "scale",
+      "label": "Scal",
+      "default": 0,
+      "mapping": { "kind": "enum", "labels": ["minor", "major", "pentatonic", "chromatic"] },
+      "display": "enum"
+    },
+    {
+      "id": "corrupt",
+      "label": "Crpt",
+      "default": 0.2,
+      "mapping": { "kind": "linear", "minimum": 0, "maximum": 100 },
+      "display": "percent"
+    },
+    {
+      "id": "drum",
+      "label": "Drum",
+      "default": 0,
+      "mapping": { "kind": "enum", "labels": ["off", "on"] },
+      "display": "enum"
+    }
+  ],
+  "presets": {},
+  "resources": {}
+}
