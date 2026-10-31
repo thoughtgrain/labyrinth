@@ -6,9 +6,13 @@ This folder is my port of two of the three labyrinth plugins to the teenage engi
 - **theseus**: the DFAM-style percussion voice.
 - **meikyu** is not here yet. See [What about meikyu?](#what-about-meikyu) for why, and what the plan is.
 
-![toro on the XY: the rider at rest, and thrown at full Fold](docs/toro_fold.png)
+![toro on the XY: the rider at rest](docs/toro_rest.png)
 
-![theseus on the XY: the helmet turned to the hats, front for the kick, and turned to the cymbal](docs/theseus_kick.png)
+![toro on the XY: thrown at full Fold, the lasso out](docs/toro_fold.png)
+
+![theseus on the XY: front for the kick](docs/theseus_kick.png)
+
+![theseus on the XY: the helmet turned to the hats, and to the cymbal](docs/theseus_hat.png)
 
 ## What changed in the port
 
@@ -37,15 +41,15 @@ On the XY's style guide: it says engine pages should not hold LFOs, because the 
 
 ### Screens
 
-The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored SVG and lets code move the parts, with a budget of 256 parts, 4 reshapable outlines and 16 greys. So each screen is now a `gen_panel.py` that writes the artwork (`panel.svg.fragment`) with every moving part as a separate element around its own pivot, and a `display.cpp` that places them. The composition and the per-control shapes are the OP-1's:
+The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored SVG and lets code move the parts, with a budget of 256 parts, 4 reshapable outlines and 16 greys. So each screen is now a `gen_panel.py` that writes the artwork (`panel.svg.fragment`) with every moving part as a separate element around its own pivot, and a `display.cpp` that places them. The geometry is lifted straight from the OP-1 sources (the same rig units, the same Bezier outlines for the bull's plate and the helmet's five heads), and anything the OP-1 drew as a chain of lines (the horns, the cowboy's legs and lasso arm, the drummer's sticks) is a chain of nodes here, each placed at the end of the one before it and turned. The composition and the per-control shapes are the OP-1's:
 
 | toro | | theseus | |
 |---|---|---|---|
-| Spread | the horns spread; the hat brim with them | Decay | ripple rings from the struck head |
-| Fold | the rig rocks, the cowboy is thrown, his legs kick, a pulse runs the hose | Punch | the kick beater winds back; a diamond on impact |
-| Cutoff | the eye slits open; a glow on notes | Cutoff | the eyes burn; rays on strong hits |
+| Spread | the horns grow and swing out; the hat brim with them | Decay | ripple rings from the struck head |
+| Fold | the rig rocks, the cowboy is thrown, his legs kick and his spurs spin, a pulse runs the hose | Punch | the kick beater winds back; a diamond on impact |
+| Cutoff | the eye slits open, his eyes with them; a note lights the slits | Cutoff | the eyes burn; rays on strong hits |
 | Res | the nose ring swings; the lasso rises and spins | FM | the crest grows, goes jagged and shakes |
-| Shape | the horn tips curl | Noise | sizzle specks |
+| Shape | the horn tips curl inward | Noise | sizzle specks |
 | Noise | sparks off the turntable | LFO | the head slides, with motion arcs |
 | Drive | steam from the vents | Rate | how fast it slides |
 | Aphx | glitch slices tear across the rig | Tune | moves which drum the sticks land on |
