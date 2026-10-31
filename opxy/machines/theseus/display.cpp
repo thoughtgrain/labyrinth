@@ -136,25 +136,31 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     const i32 bob = (3 * expneg(t * 1024 / 90)) >> 0;      /* Q10 px */
     const i32 hx = NECK_X * unit + st.sway, hy = NECK_Y * unit + bob;
     for (i32 v = 0; v < 5; ++v) {
-        if (v == st.view) { place(fr, N_HEAD + v, hx, hy, HELM, B_EDGE, fill_and_stroke); place(fr, N_SLOT + v, hx, hy, HELM, S_BLACK, fill_and_stroke); }
+        if (v == st.view) { place(fr, N_HEAD + v, hx, hy, HELM, S_EDGE, stroke); place(fr, N_SLOT + v, hx, hy, HELM, S_BLACK, fill_and_stroke); }
         else { hide(fr, N_HEAD + v); hide(fr, N_SLOT + v); }
     }
-    /* FM: the crest, 12 bristles along the crown; longer, jagged and shaking with FM */
+    /* FM: the crest, 12 bristles rooted along the stalk (the OP-1's Bezier, sampled), pointing outward from it;
+       longer, jagged and shaking with FM */
     {
         const i32 shake = still ? 0 : (fm * expneg(t * 1024 / 260)) >> 10;
-        const i32 mirror = st.view < 2 ? -1 : 1, prof = st.view == 0 || st.view == 4, tq = st.view == 1 || st.view == 3;
+        const i32 mirror = st.view < 2 ? -1 : 1;
+        /* the stalk's control points per view, head units x 8 (OP-1 curves: profile (12,-22)(7,-38)(-17,-39)(-28,-13),
+           three-quarter (12,-21)(6,-35)(-14,-36)(-23,-14), front (-11,-20)(-6,-29)(6,-29)(11,-20)) */
+        static const i32 K[3][8] = { { 96, -176, 56, -304, -136, -312, -224, -104 }, { 96, -168, 48, -280, -112, -288, -184, -112 }, { -88, -160, -48, -232, 48, -232, 88, -160 } };
+        const i32* k = K[st.view == 0 || st.view == 4 ? 0 : st.view == 2 ? 2 : 1];
         for (i32 j = 0; j < 12; ++j) {
-            /* the crown as an arc in head units: from the brow back over the top */
-            /* tenths of a degree, clockwise from +x; -y is up. Profile: from above the brow (facing +x) back over the crown to the nape;
-               three-quarter: a shorter sweep; front: a narrow fan on top */
-            const i32 a = prof ? (-(500 + j * 110)) : tq ? (-(600 + j * 100)) : (-(1160 + j * 60) + 330);
-            const i32 r = prof ? 25 : tq ? 25 : 23;
-            const i32 bx = (sine(a + 900) * r) >> 0, by = ((sine(a) * r) >> 0) - 2 * unit;          /* Q10 head units (y down) */
+            const i32 u = 70 + j * 80, w = 1024 - u;                                                   /* Q10 along the curve, inset from the ends */
+            const i32 b0 = (((w * w) >> 10) * w) >> 10, b1 = 3 * ((((w * w) >> 10) * u) >> 10), b2 = 3 * ((((w * u) >> 10) * u) >> 10), b3 = (((u * u) >> 10) * u) >> 10;
+            const i32 bx = (k[0] * b0 + k[2] * b1 + k[4] * b2 + k[6] * b3) >> 3, by = (k[1] * b0 + k[3] * b1 + k[5] * b2 + k[7] * b3) >> 3;   /* Q10 head units */
+            const i32 dx = (k[2] - k[0]) * (w * w >> 10) + 2 * (k[4] - k[2]) * ((w * u) >> 10) + (k[6] - k[4]) * (u * u >> 10);          /* tangent */
+            const i32 dy = (k[3] - k[1]) * (w * w >> 10) + 2 * (k[5] - k[3]) * ((w * u) >> 10) + (k[7] - k[5]) * (u * u >> 10);
+            i32 nx = dy, ny = -dx;                                                                     /* a normal */
+            if ((((nx >> 8) * ((bx - (st.view == 2 ? 0 : -5 * unit)) >> 6)) + ((ny >> 8) * ((by + 8 * unit) >> 6))) < 0) { nx = -nx; ny = -ny; }   /* outward: away from the crown's centre */
+            const i32 ang = angle_of((nx >> 8) * mirror, ny >> 8);                                                 /* tenths of a degree from +x */
             const i32 len = 1024 + ((1536 * fm) >> 10) + ((j & 1) ? ((1200 * fm) >> 10) : 0) + (((640 * shake) >> 10) * sine((t * 30 + j * 900) % 3600) >> 10);
             const i32 cx = hx + ((bx * mirror * HELM) >> 10), cy = hy + ((by * HELM) >> 10);
             place(fr, N_BRISTLE + j, cx, cy, clamp(len, 512, 2048), S_LITE, fill_and_stroke);
-            const i32 up = st.view == 2 ? ((a + 900) * 3 / 4) : mirror * (a + 900) + (mirror < 0 ? 1800 : 0);   /* the front fan stands straighter */
-            turn(fr, N_BRISTLE + j, rotation(up + ((shake * sine((t * 26 + j * 700) % 3600) * 150) >> 20)));
+            turn(fr, N_BRISTLE + j, rotation(ang + 900 + ((shake * sine((t * 26 + j * 700) % 3600) * 150) >> 20)));   /* the bristle points -y at rest: +90 turns it along the normal */
         }
     }
     /* Cutoff: the eyes, round embers; rays on strong hits */

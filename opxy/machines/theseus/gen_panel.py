@@ -22,7 +22,7 @@ Node map (keep in step with display.cpp):
 Copyright (c) 2026 briannhinton. MIT."""
 K = 0.5523
 SHELL, HEAD, EDGE, DEC, LITE = '#141414', '#1E1E1E', '#B9B9C9', '#625D77', '#F0F0F0'
-HELM = '#2C2C2C'
+HELM = '#4A4A4A'
 
 
 def f(v):
@@ -111,46 +111,59 @@ def main():
         pts = [(math.cos(k * 2 * math.pi / 64) * 20, math.sin(k * 2 * math.pi / 64) * 20) for k in range(64)]
         o.append(node(i, poly(pts), None, LITE, 1.5))
 
-    # ---- the five heads: helmet units (the OP-1's), origin at the neck pivot; scaled 1.1 x S on screen ----
-    def bez(p0, p1, p2, p3):
+    # ---- the five heads: the OP-1's helmet geometry (helmet units, origin at the neck pivot, +x faces right), as
+    # one filled path each. Left-facing heads are the right-facing ones mirrored. The crest's stalk is drawn with each
+    # head (the bristles ride on it as nodes). The face openings (eye slots, the cheek gap) are separate dark nodes
+    # 56..60 that ride on the same transform, because the XY fills with the nonzero rule, so holes cannot be subpaths. ----
+    def bez(p1, p2, p3):
         return f'C{f(p1[0])},{f(p1[1])} {f(p2[0])},{f(p2[1])} {f(p3[0])},{f(p3[1])}'
-    def profile(sign):   # facing +x for sign 1; mirrored for -1
-        m = lambda p: (p[0] * sign, p[1])
-        d = f'M{f(-16 * sign)},14 ' + bez(m((-16, 14)), m((-20, 4)), m((-21, -10)), m((-14, -18))) + ' ' + bez(m((-14, -18)), m((-8, -24)), m((6, -25)), m((13, -18))) + ' ' + bez(m((13, -18)), m((17, -14)), m((19, -9)), m((19.5, -4)))
-        d += f' L{f(21 * sign)},9 L{f(17 * sign)},10.5 L{f(14 * sign)},4.5 L{f(12.5 * sign)},8 ' + bez(m((12.5, 8)), m((15, 12)), m((18, 16)), m((19, 20))) + f' L{f(12 * sign)},22 ' + bez(m((12, 22)), m((6, 22)), m((0, 18)), m((-4, 16))) + ' ' + bez(m((-4, 16)), m((-8, 18)), m((-12, 18)), m((-16, 14))) + ' Z'
-        # the face opening: eye slot and the cheek gap, as holes drawn in the shell colour on top (separate subpaths, fill rule nonzero: so they are drawn as a second node? no: keep them in the same path and rely on even-odd? The XY's renderer fills nonzero. Draw them in display as a dark node instead.)
-        return d
+    def M(p): return f'M{f(p[0])},{f(p[1])}'
+    def L(p): return f'L{f(p[0])},{f(p[1])}'
+    def profile(sign):
+        m = lambda x, y: (x * sign, y)
+        # bowl + neck guard + nose guard + cheek guard, one outline
+        d = [M(m(-16, 14)), bez(m(-20, 4), m(-21, -10), m(-14, -18)), bez(m(-8, -24), m(6, -25), m(13, -18)), bez(m(17, -14), m(19, -9), m(19.5, -4)),
+             L(m(21, 9)), L(m(17, 10.5)), L(m(14, 4.5)), L(m(12.5, 8)), bez(m(15, 12), m(18, 16), m(19, 20)), L(m(12, 22)), bez(m(6, 22), m(0, 18), m(-4, 16)),
+             bez(m(-8, 18), m(-12, 18), m(-16, 14)), 'Z']
+        # crest stalk: a closed ribbon along the OP-1's curve from (12,-22) to (-28,-13), 2 units thick
+        stalk = [M(m(12, -22)), bez(m(7, -38), m(-17, -39), m(-28, -13)), L(m(-26.5, -12.5)), bez(m(-16, -36), m(7, -35), m(10.5, -21.5)), 'Z']
+        holder = [M(m(8, -20)), L(m(12, -24)), L(m(15, -19)), 'Z', M(m(-19, -13)), L(m(-25, -14)), L(m(-20, -9)), 'Z']
+        return ' '.join(d + stalk + holder)
     def three_quarter(sign):
-        m = lambda p: (p[0] * sign, p[1])
-        d = f'M{f(-19 * sign)},-3 ' + bez(m((-19, -3)), m((-19.5, -17)), m((-10, -24.5)), m((1, -24))) + ' ' + bez(m((1, -24)), m((12, -23.5)), m((18.5, -16)), m((18.5, -3)))
-        d += f' L{f(19 * sign)},7 ' + bez(m((19, 7)), m((18.5, 15)), m((15, 20)), m((9, 22.5))) + f' L{f(6 * sign)},22.5 L{f(6 * sign)},9 L{f(3 * sign)},9 L{f(3 * sign)},23 L{f(-3 * sign)},22 ' + bez(m((-3, 22)), m((-10, 21)), m((-16, 18)), m((-18, 10))) + ' Z'
-        return d
+        m = lambda x, y: (x * sign, y)
+        d = [M(m(-19, -3)), bez(m(-19.5, -17), m(-10, -24.5), m(1, -24)), bez(m(12, -23.5), m(18.5, -16), m(18.5, -3)), L(m(19, 7)),
+             bez(m(18.5, 15), m(15, 20), m(9, 22.5)), L(m(6, 22.5)), L(m(6, 9)), L(m(3, 9)), L(m(3, 23)), L(m(-3, 22)), bez(m(-10, 21), m(-16, 18), m(-18, 10)), 'Z']
+        stalk = [M(m(12, -21)), bez(m(6, -35), m(-14, -36), m(-23, -14)), L(m(-21.5, -13.5)), bez(m(-13, -33), m(6, -32), m(10.5, -20.5)), 'Z']
+        return ' '.join(d + stalk)
     def front():
-        d = 'M-19.5,-4 ' + bez((-19.5, -4), (-19.5, -17), (-11, -24), (0, -24)) + ' ' + bez((0, -24), (11, -24), (19.5, -17), (19.5, -4))
-        d += ' L20,6 ' + bez((20, 6), (19, 16), (14, 21), (7, 23)) + ' L3,23 L3,9 L-3,9 L-3,23 L-7,23 ' + bez((-7, 23), (-14, 21), (-19, 16), (-20, 6)) + ' Z'
-        return d
+        d = [M((-19.5, -4)), bez((-19.5, -17), (-11, -24), (0, -24)), bez((11, -24), (19.5, -17), (19.5, -4)), L((20, 6)), bez((19, 16), (14, 21), (7, 23)),
+             L((3, 23)), L((3, 9)), L((-3, 9)), L((-3, 23)), L((-7, 23)), bez((-14, 21), (-19, 16), (-20, 6)), 'Z']
+        stalk = [M((-11, -20)), bez((-6, -29), (6, -29), (11, -20)), L((9.5, -19)), bez((5.5, -27), (-5.5, -27), (-9.5, -19)), 'Z']
+        return ' '.join(d + stalk)
     heads = [profile(-1), three_quarter(-1), front(), three_quarter(1), profile(1)]
     for i, d in enumerate(heads):
         o.append(node(10 + i, d, HELM, EDGE, 1.5))
-    # the face openings, one per head, drawn dark over the head (the renderer fills nonzero, so holes are nodes)
-    # they are static shapes in head units; display.cpp places them with the head. nodes 56..60
+    # brow bands and the three-quarter's brow line: thin dark ribbons on the heads (nodes 61..63 for L prof, front, R prof; the 3/4 use the slot node)
     def slot_profile(sign):
-        m = lambda p: (p[0] * sign, p[1])
-        s1 = poly([m(p) for p in ((6.5, -7), (11, -10), (19.6, -9.6), (19.6, -5), (11, -4.4))])
-        s2 = poly([m(p) for p in ((14.6, -5), (17, -5), (15.6, 4.8), (13.4, 4.8))])
-        return s1 + ' ' + s2
+        m = lambda x, y: (x * sign, y)
+        s1 = poly([m(*p) for p in ((6.5, -7), (11, -10), (19.6, -9.6), (19.6, -5), (11, -4.4))])
+        s2 = poly([m(*p) for p in ((14.6, -5), (17, -5), (15.6, 4.8), (13.4, 4.8))])
+        brow = ribbon([m(-17, 2), m(-8, -2), m(4, -3), m(11, -4.4)], 0.8)
+        return s1 + ' ' + s2 + ' ' + brow
     def slot_tq(sign):
-        m = lambda p: (p[0] * sign, p[1])
-        return poly([m(p) for p in ((6, -9.6), (16.5, -9), (17.5, -4.5), (6, -4.2))]) + ' ' + poly([m(p) for p in ((-9, -8.5), (3, -9.6), (3, -4.2), (-8.5, -4.2))]) + ' ' + poly([m(p) for p in ((3, 9), (6, 9), (6, 22.5), (3, 23))])
+        m = lambda x, y: (x * sign, y)
+        return (poly([m(*p) for p in ((6, -9.6), (16.5, -9), (17.5, -4.5), (6, -4.2))]) + ' ' + poly([m(*p) for p in ((-9, -8.5), (3, -9.6), (3, -4.2), (-8.5, -4.2))])
+                + ' ' + poly([m(*p) for p in ((3, 9), (6, 9), (6, 22.5), (3, 23))]))
     def slot_front():
-        return poly([(15.5, -9), (3, -10), (3, -4.5), (14.5, -4)]) + ' ' + poly([(-15.5, -9), (-3, -10), (-3, -4.5), (-14.5, -4)]) + ' ' + poly([(-3, 9), (3, 9), (3, 23), (-3, 23)])
+        return (poly([(15.5, -9), (3, -10), (3, -4.5), (14.5, -4)]) + ' ' + poly([(-15.5, -9), (-3, -10), (-3, -4.5), (-14.5, -4)])
+                + ' ' + poly([(-3, 9), (3, 9), (3, 23), (-3, 23)]) + ' ' + poly([(-19.5, -4), (19.5, -4), (19.5, -3.2), (-19.5, -3.2)]))
     slots = [slot_profile(-1), slot_tq(-1), slot_front(), slot_tq(1), slot_profile(1)]
     for i, d in enumerate(slots):
         o.append(node(56 + i, d, '#060608', '#060608', 0.5))
 
     # ---- crest bristles (15..26): a unit bristle pointing -y, placed along the crown ----
     for i in range(12):
-        o.append(node(15 + i, 'M-0.7,0 L0.7,0 L0.5,-8 L-0.5,-8 Z', LITE, LITE, 0.5))
+        o.append(node(15 + i, 'M-0.8,0 L0.8,0 L0.25,-9 L-0.25,-9 Z', LITE, LITE, 0.4))
     # ---- eyes (27, 28): a disc; rays (29): six spokes ----
     o.append(node(27, ellipse(0, 0, 2, 2), LITE, LITE, 0.5))
     o.append(node(28, ellipse(0, 0, 2, 2), LITE, LITE, 0.5))
