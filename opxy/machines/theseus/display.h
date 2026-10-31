@@ -4,7 +4,7 @@
 // theseus for the OP-XY: the PHALANX screen's state. Matches resources.display in definition.json.
 // Copyright (c) 2026 briannhinton. MIT.
 namespace theseus {
-using Frame = opxy::draw::Frame<2, 64, 64, 16, 16>;   // paths, points, nodes, texts, palette
+using Frame = opxy::draw::Frame<2, 64, 119, 16, 16>;   // paths, points, nodes, texts, palette
 struct Hit { opxy::i32 drum, t; };                      // drum index, ms since
 struct DisplayState {
     opxy::draw::PageHeader header;     // 20

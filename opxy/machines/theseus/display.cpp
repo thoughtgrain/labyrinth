@@ -14,6 +14,7 @@
  * does. The head swaps between five drawings (left, left 3/4, front, right 3/4, right), one step every two frames,
  * to look at the drum hit; it never rotates or scales. Copyright (c) 2026 briannhinton. MIT. */
 #include "display.h"
+#include "nodes.h"
 #include <opxy/q31.hpp>
 
 namespace theseus {
@@ -22,13 +23,14 @@ using opxy::i32;
 using opxy::u32;
 using namespace opxy::draw;
 
-const i32 S = 1485;                                   // OP-1 units -> XY pixels, Q10 (1.45)
-inline i32 PX(i32 x) { return ((x * S) >> 10) + 8; }  // OP-1 x -> XY x (pixels)
-inline i32 PY(i32 y) { return (((y - 8) * S) >> 10) + 50; }
-const i32 HELM = 1638;                                // head scale: 1.1 x 1.45, Q10
+const i32 SX = 1638, SY = 1331;                       // the kit's stretch: OP-1 units -> XY pixels, Q10 (1.6, 1.3), as gen_panel.py
+const i32 S = SX;                                     // the uniform scale for rings and other round things
+inline i32 PX(i32 x) { return (((x - 160) * SX) >> 10) + 240; }   // OP-1 x -> XY x (pixels)
+inline i32 PY(i32 y) { return (((y - 8) * SY) >> 10) + 40; }
+inline i32 PXq(i32 xq) { return (((xq - 160 * unit) * SX) >> 10) + 240 * unit; }   // the same for Q10 inputs
+inline i32 PYq(i32 yq) { return (((yq - 8 * unit) * SY) >> 10) + 40 * unit; }
+const i32 HELM = 1536;                                // head scale, Q10 (1.5)
 const i32 NECK_X = PX(158), NECK_Y = PY(70);          // the neck pivot
-enum { N_RIPPLE = 0, N_SWAY = 1, N_HDR = 2, N_HEAD = 10, N_BRISTLE = 15, N_EYE_L = 27, N_EYE_R = 28, N_RAYS = 29,
-       N_UARM = 30, N_FARM = 32, N_BEATER = 34, N_THUMP = 35, N_HAT = 36, N_CYM = 37, N_RING = 38, N_SPECK = 46, N_ARC = 54, N_SLOT = 56, N_SPARE = 61 };
 enum { B_DIM = 1, B_DEC = 2, B_MID = 3, B_SEC = 5, B_EDGE = 6, B_LITE = 7, S_BLACK = 8, S_DARK = 9, S_DEC = 10, S_MID = 11, S_SEC = 12, S_EDGE = 13, S_LITE = 14, S_WHITE = 15 };
 enum { D_KICK, D_FLOOR, D_RACK, D_SNARE, D_HAT, D_CYM, D_N };
 struct Drum { i32 cx, cy, rx, ry, tipdx, hx, hy, side; };   // OP-1 units
@@ -50,6 +52,13 @@ inline i32 expneg(i32 x)
 inline i32 recoil(i32 t) { if (t <= 40) return 0; if (t >= 260) return unit; const i32 u = (t - 40) * unit / 220; return (u * (2 * unit - u)) >> 10; }
 inline i32 lerp(i32 a, i32 b, i32 f) { return a + (((b - a) * f) >> 10); }
 inline u32 hash(u32 s) { return s * 1664525u + 1013904223u; }
+/* a group of parts sharing a pivot: the same transform for each, the artwork's own paint */
+inline void group(Frame& fr, u32 first, u32 count, i32 x, i32 y, i32 scale, i32 tenths)
+{
+    const Turn t = rotation(tenths);
+    for (u32 i = 0; i < count; ++i) { place(fr, first + i, x, y, scale, 0, keep); turn(fr, first + i, t); }
+}
+inline void hide_group(Frame& fr, u32 first, u32 count) { for (u32 i = 0; i < count; ++i) hide(fr, first + i); }
 inline i32 isqrt(u32 v) { u32 r = 0, b = 1u << 30; while (b > v) b >>= 2; while (b) { if (v >= r + b) { v -= r + b; r = (r >> 1) + b; } else r >>= 1; b >>= 2; } return static_cast<i32>(r); }
 /* angle (tenths of a degree, clockwise from +x) of a vector, via the SDK's sine: a small iterative atan2 */
 inline i32 angle_of(i32 dx, i32 dy)
@@ -136,8 +145,8 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     const i32 bob = (3 * expneg(t * 1024 / 90)) >> 0;      /* Q10 px */
     const i32 hx = NECK_X * unit + st.sway, hy = NECK_Y * unit + bob;
     for (i32 v = 0; v < 5; ++v) {
-        if (v == st.view) { place(fr, N_HEAD + v, hx, hy, HELM, S_EDGE, stroke); place(fr, N_SLOT + v, hx, hy, HELM, S_BLACK, fill_and_stroke); }
-        else { hide(fr, N_HEAD + v); hide(fr, N_SLOT + v); }
+        if (v == st.view) group(fr, N_HEAD_0 + v * N_HEAD_0_COUNT, N_HEAD_0_COUNT, hx, hy, HELM, 0);
+        else hide_group(fr, N_HEAD_0 + v * N_HEAD_0_COUNT, N_HEAD_0_COUNT);
     }
     /* FM: the crest, 12 bristles rooted along the stalk (the OP-1's Bezier, sampled), pointing outward from it;
        longer, jagged and shaking with FM */
@@ -159,7 +168,7 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
             const i32 ang = angle_of((nx >> 8) * mirror, ny >> 8);                                                 /* tenths of a degree from +x */
             const i32 len = 1024 + ((1536 * fm) >> 10) + ((j & 1) ? ((1200 * fm) >> 10) : 0) + (((640 * shake) >> 10) * sine((t * 30 + j * 900) % 3600) >> 10);
             const i32 cx = hx + ((bx * mirror * HELM) >> 10), cy = hy + ((by * HELM) >> 10);
-            place(fr, N_BRISTLE + j, cx, cy, clamp(len, 512, 2048), S_LITE, fill_and_stroke);
+            place(fr, N_BRISTLE + j, cx, cy, clamp(len, 512, 2048), 0, keep);
             turn(fr, N_BRISTLE + j, rotation(ang + 900 + ((shake * sine((t * 26 + j * 700) % 3600) * 150) >> 20)));   /* the bristle points -y at rest: +90 turns it along the normal */
         }
     }
@@ -176,8 +185,8 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
             const i32 far = (st.view == 1 || st.view == 3) && i == 1 ? 680 : 1024;
             place(fr, N_EYE_L + i, x, y, (sz * far) >> 10, cut > 60 ? S_LITE : S_DEC, cut > 60 ? fill_and_stroke : stroke);
         }
-        if (!still && cut > 600 && t < 160) { place(fr, N_RAYS, hx + ((ex[0] * HELM) >> 10), hy + ((ey[0] * HELM) >> 10), sz, S_WHITE, fill_and_stroke); turn(fr, N_RAYS, rotation(static_cast<i32>(st.clock % 3600u))); }
-        else hide(fr, N_RAYS);
+        if (!still && cut > 600 && t < 160) group(fr, N_RAYS, N_RAYS_COUNT, hx + ((ex[0] * HELM) >> 10), hy + ((ey[0] * HELM) >> 10), sz, static_cast<i32>(st.clock % 3600u));
+        else hide_group(fr, N_RAYS, N_RAYS_COUNT);
     }
     /* LFO (page 2): motion arcs trail the head's slide */
     {
@@ -192,8 +201,8 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         const i32 tc = st.side_d[1] == D_CYM ? st.side_t[1] : 9000, th = st.side_d[0] == D_HAT ? st.side_t[0] : 9000;
         const i32 wc = still ? -60 : -60 + ((((100 * expneg(tc * 1024 / 450)) >> 10) * sine((tc * 4) % 3600 + 900)) >> 10);
         const i32 wh = still ? 0 : (((30 * expneg(th * 1024 / 180)) >> 10) * sine((th * 5) % 3600 + 900)) >> 10;
-        place(fr, N_CYM, PX(230) * unit, PY(66) * unit, unit, S_SEC, stroke); turn(fr, N_CYM, rotation(wc));
-        place(fr, N_HAT, PX(94) * unit, PY(77) * unit - ((2 * expneg(th * 1024 / 120)) >> 0), unit, S_SEC, stroke); turn(fr, N_HAT, rotation(wh));
+        group(fr, N_CYM, N_CYM_COUNT, PX(230) * unit, PY(66) * unit, unit, wc);
+        group(fr, N_HAT, N_HAT_COUNT, PX(94) * unit, PY(77) * unit - ((2 * expneg(th * 1024 / 120)) >> 0), unit, wh);
     }
     /* Decay: ripple rings from each recent hit */
     {
@@ -244,7 +253,7 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         const i32 g = recoil(st.side_t[2]);
         const i32 rest = -(150 + ((450 * pnch) >> 10));       /* tenths of a degree: lean left 15 .. 60 */
         const i32 a = still ? rest : (rest * g) >> 10;
-        place(fr, N_BEATER, PX(166) * unit, PY(139) * unit, 870 + ((pnch * 460) >> 10), S_LITE, fill_and_stroke); turn(fr, N_BEATER, rotation(a));
+        group(fr, N_BEATER, N_BEATER_COUNT, PX(166) * unit, PY(139) * unit, 870 + ((pnch * 460) >> 10), a);
         if (!still && st.side_t[2] < 90 && st.side_d[2] == D_KICK) {
             const i32 bx = PX(166) * unit + ((sine(a) * -24 * (870 + ((pnch * 460) >> 10))) >> 10), by = PY(139) * unit - ((sine(a + 900) * 24 * (870 + ((pnch * 460) >> 10))) >> 10);
             place(fr, N_THUMP, bx, by, unit + ((pnch * 600) >> 10), S_LITE, stroke);
@@ -275,20 +284,19 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         /* place in XY pixels: the upper arm from the shoulder toward the elbow, the forearm from the elbow toward the hand,
            the stick continuing from the hand to the tip */
         const i32 SXp = PX(SHOULDER[s][0]) * unit, SYp = PY(SHOULDER[s][1]) * unit;
-        const i32 EXp = ((ex * S) >> 10) + 8 * unit, EYp = (((ey - 8 * unit) * S) >> 10) + 50 * unit;
-        const i32 HXp = ((hx_ * S) >> 10) + 8 * unit, HYp = (((hy_ - 8 * unit) * S) >> 10) + 50 * unit;
-        const i32 TXp = ((tx_ * S) >> 10) + 8 * unit, TYp = (((ty_ - 8 * unit) * S) >> 10) + 50 * unit;
+        const i32 EXp = PXq(ex), EYp = PYq(ey);
+        const i32 HXp = PXq(hx_), HYp = PYq(hy_);
+        const i32 TXp = PXq(tx_), TYp = PYq(ty_);
         const i32 ua = angle_of(EXp - SXp, EYp - SYp);
         const i32 ul = isqrt(static_cast<u32>(((EXp - SXp) >> 4) * ((EXp - SXp) >> 4) + ((EYp - SYp) >> 4) * ((EYp - SYp) >> 4))) << 4;
-        place(fr, N_UARM + s, SXp, SYp, clamp(ul / 30, 256, 2048), S_SEC, stroke); turn(fr, N_UARM + s, rotation(ua));
+        group(fr, s ? N_UARM_R : N_UARM_L, N_UARM_L_COUNT, SXp, SYp, clamp(ul / 30, 256, 2048), ua);
         /* the forearm node is the forearm plus the stick in one piece, pointing +x from the elbow; scale it to the elbow-hand length and
            turn it toward the hand; the stick's tip then lands near the drum (the authored stick is 32 units past a 26-unit forearm) */
         const i32 fa = angle_of(HXp - EXp, HYp - EYp);
         const i32 fl = isqrt(static_cast<u32>(((HXp - EXp) >> 4) * ((HXp - EXp) >> 4) + ((HYp - EYp) >> 4) * ((HYp - EYp) >> 4))) << 4;
-        place(fr, N_FARM + s, EXp, EYp, clamp(fl / 26, 256, 2048), S_SEC, stroke); turn(fr, N_FARM + s, rotation(fa));
+        group(fr, s ? N_FARM_R : N_FARM_L, N_FARM_L_COUNT, EXp, EYp, clamp(fl / 26, 256, 2048), fa);
         (void)TXp; (void)TYp;
     }
     hide(fr, N_RIPPLE); hide(fr, N_SWAY);
-    for (u32 i = N_SPARE; i < Frame::node_count; ++i) hide(fr, i);
 }
 }
