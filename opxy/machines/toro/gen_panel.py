@@ -19,15 +19,15 @@ Node map (keep in step with display.cpp):
   2..9    the two-page header's bar steps (SDK)
   10      shadow                              11      rod (the ram)
   12      body: barrel, seams, ears, handle   13, 14  horns L, R           15, 16  horn tips       17, 18  horn root rings
-  19      faceplate + muzzle                  20      faceplate decals (brow and cheek lines)   21  vents
+  19      faceplate + muzzle                  20      faceplate decals (brow and cheek lines, the vents)   21  his smile
   22, 23  eye slits L, R                      24, 25  slit highlights L, R (lit on a note)
   26      nose ring                           27..30  steam puffs          31..36  sparks (NOIS)   37  hose pulse
   38      cowboy torso + rein arm             39      belt, buckle, bandana crease
-  40      his head                            41      his face (eyes, brows, mouth; scaled wide when thrown)
+  40      his head                            41      his eyes and brows (scaled wide when thrown)
   42      hat brim                            43      hat crown
   44      lasso upper arm                     45      lasso forearm + hand
   46, 47  thighs L, R                         48, 49  shins L, R           50, 51  spur wheels L, R
-  52..59  APHX tear slices                    60      the lasso knot       61, 62  boots L, R   63  spare
+  52..59  APHX tear slices                    60      the lasso knot       61, 62  boots L, R   63  his O mouth
 Copyright (c) 2026 briannhinton. MIT."""
 import math
 
@@ -167,9 +167,15 @@ def main():
     hx, hy = c(0, -81.5)
     o.append(node(40, ellipse(hx, hy, 6.6 * CS, 6.6 * CS), BODY, SEC, 1.5, 640, 320))
     eyes = ' '.join(ellipse(2.5 * sd * CS, -1.1 * CS, 1.0 * CS, 1.0 * CS) for sd in (-1, 1))
+    pupils = ' '.join(ellipse(2.7 * sd * CS, -0.9 * CS, 0.3 * CS, 0.3 * CS) for sd in (-1, 1))
     brows = ' '.join(ribbon([(1.2 * sd * CS, -3.5 * CS), (3.8 * sd * CS, -2.7 * CS)], 0.8) for sd in (-1, 1))
-    mouth = bez_ribbon((-2.6 * CS, 2.7 * CS), (-1.3 * CS, 4.2 * CS), (1.3 * CS, 4.2 * CS), (2.6 * CS, 2.7 * CS), 1.0, 6)
-    o.append(node(41, ' '.join([eyes, brows, mouth]), None, LITE, 1.2, 640, 320))
+    nose = ribbon([(0.2 * CS, -0.6 * CS), (0.9 * CS, 1.3 * CS), (-0.3 * CS, 1.5 * CS)], 0.3)
+    cheeks = ' '.join(ribbon([(3.6 * sd * CS, 1.6 * CS), (3.0 * sd * CS, 3.2 * CS)], 0.3) for sd in (-1, 1))
+    o.append(node(41, ' '.join([eyes, pupils, brows, nose, cheeks]), None, LITE, 1.0, 640, 320))
+    # his mouth: a smile (21) while calm, an O (63) as the bull throws him; both pivot at the head centre
+    smile = bez_ribbon((-2.6 * CS, 2.7 * CS), (-1.3 * CS, 4.2 * CS), (1.3 * CS, 4.2 * CS), (2.6 * CS, 2.7 * CS), 0.25, 8)
+    o.append(node(21, smile, None, LITE, 1.1, 640, 320))
+    o.append(node(63, ellipse(0, 3.5 * CS, 0.9 * CS, 1.2 * CS), None, LITE, 1.2, 640, 320))
     # hat: brim (42) a lens, pivot at the crown's base; crown (43) the dome and its band, same pivot
     def hs(x, y):
         return (x * HS * CS, (y - HATY) * HS * CS)
@@ -187,10 +193,10 @@ def main():
     head = [(-20, -22), (20, -22), (27, -10), (24, 4), (17, 16), (14, 28), (8, 32), (-8, 32), (-14, 28), (-17, 16), (-24, 4), (-27, -10)]
     muzzle = [(-12, 13), (12, 13), (14, 24), (9, 31), (-9, 31), (-14, 24)]
     o.append(node(19, poly([h(*p) for p in head]), PLATE, EDGE, 2, 640, 320))
-    o.append(node(20, ' '.join([poly([h(*p) for p in muzzle])] + [ribbon([h(27 * sd, -10), h(10 * sd, -7)], 0.9) for sd in (-1, 1)]
-                                + [ribbon([h(24 * sd, 4), h(14 * sd, 13)], 0.7) for sd in (-1, 1)]), MUZ, DEC, 1.2, 640, 320))
-    # vents (21): two dark slots in the muzzle
-    o.append(node(21, ' '.join(poly([h(x * sd, y) for x, y in [(3.5, 18), (9, 18), (8, 23), (4, 23)]]) for sd in (-1, 1)), '#000000', DEC, 0.8, 640, 320))
+    # vents: two slots in the muzzle, a separate path so they read as cut-outs
+    vents = ' '.join(poly([h(x * sd, y) for x, y in [(3.5, 18), (9, 18), (8, 23), (4, 23)]]) for sd in (-1, 1))
+    o.append(node(20, ' '.join([poly([h(*p) for p in muzzle]), vents] + [ribbon([h(27 * sd, -10), h(10 * sd, -7)], 0.9) for sd in (-1, 1)]
+                                + [ribbon([h(24 * sd, 4), h(14 * sd, 13)], 0.7) for sd in (-1, 1)]), '#000000', DEC, 1.2, 640, 320))
     # eye slits (22, 23): the OP-1's quads, pivot at each slit's middle; a scale opens them. Highlights (24, 25) inside.
     for i, sd in ((22, -1), (23, 1)):
         q = [(21, -9), (8, -5.2), (8, 1.5), (20, -1.8)]
@@ -267,8 +273,6 @@ def main():
         o.append(node(52 + i, 'M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z', LITE, LITE, 0.5, 640, 320))
     # the lasso knot (60) and spares
     o.append(node(60, ellipse(0, 0, 2.2, 2.2), None, LITE, 1.5, 640, 320))
-    for i in range(63, 64):
-        o.append(node(i, 'M-1,-1 L1,-1 L1,1 L-1,1 Z', None, DEC, 1, 640, 320))
 
     # ---- palette: 0..7 a near-black fill with an outline from dim to white (bodies), 8..15 solid greys (lit parts) ----
     outlines = ['#2A2A2A', '#3C3C3C', '#5A5A5A', '#707070', '#8C8C8C', '#A8A8A8', '#CBCBCB', '#F0F0F0']

@@ -26,9 +26,9 @@ const i32 CX = 240, BASE = 208, TOP0 = 186;          // the ram's foot and its r
 const i32 RIG = 973;                                  // rig units -> pixels, Q10 (0.95)
 const i32 CS = 1587;                                  // the cowboy's scale, Q10 (1.55)
 const i32 HK = 1198;                                  // the head's scale, Q10 (1.17)
-enum { N_LASSO = 0, N_ROPE = 1, N_HDR = 2, N_SHADOW = 10, N_ROD = 11, N_BODY = 12, N_HORN = 13, N_PLATE = 19, N_DECAL = 20, N_VENTS = 21,
-       N_EYE = 22, N_HILITE = 24, N_RING = 26, N_STEAM = 27, N_SPARK = 31, N_PULSE = 37, N_TORSO = 38, N_BELT = 39, N_HEAD = 40, N_FACE = 41,
-       N_BRIM = 42, N_CROWN = 43, N_UPPER = 44, N_FORE = 45, N_THIGH = 46, N_SHIN = 48, N_SPUR = 50, N_TEAR = 52, N_KNOT = 60, N_BOOT = 61, N_SPARE = 63 };
+enum { N_LASSO = 0, N_ROPE = 1, N_HDR = 2, N_SHADOW = 10, N_ROD = 11, N_BODY = 12, N_HORN = 13, N_PLATE = 19, N_DECAL = 20,
+       N_EYE = 22, N_HILITE = 24, N_SMILE = 21, N_OMOUTH = 63, N_RING = 26, N_STEAM = 27, N_SPARK = 31, N_PULSE = 37, N_TORSO = 38, N_BELT = 39, N_HEAD = 40, N_FACE = 41,
+       N_BRIM = 42, N_CROWN = 43, N_UPPER = 44, N_FORE = 45, N_THIGH = 46, N_SHIN = 48, N_SPUR = 50, N_TEAR = 52, N_KNOT = 60, N_BOOT = 61 };
 /* palette: 0..7 body entries (near-black fill, outline dim..white); 8..15 solid greys */
 enum { B_DIM = 1, B_DEC = 2, B_MID = 3, B_SEC = 5, B_EDGE = 6, B_LITE = 7, S_BLACK = 8, S_DARK = 9, S_DEC = 10, S_MID = 11, S_SEC = 12, S_EDGE = 13, S_LITE = 14, S_WHITE = 15 };
 
@@ -128,7 +128,6 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     place(fr, N_BODY, cx * unit, top * unit, RIG, B_SEC, stroke); turn(fr, N_BODY, rotation(lean));
     place(fr, N_PLATE, cx * unit, top * unit, RIG, B_EDGE, stroke); turn(fr, N_PLATE, rotation(lean));
     place(fr, N_DECAL, cx * unit, top * unit, RIG, B_DEC, stroke); turn(fr, N_DECAL, rotation(lean));
-    place(fr, N_VENTS, cx * unit, top * unit, RIG, B_DEC, stroke); turn(fr, N_VENTS, rotation(lean));
 
     /* SPREAD: the horns grow and swing outward; SHAPE curls the tips inward. One curved tube each, a tip on its end */
     for (int sd = -1; sd <= 1; sd += 2) {
@@ -234,6 +233,9 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         /* his face: eyes wide with CUT and wider as he is thrown (a scale about the head's centre) */
         cw.at(0, -81);
         place(fr, N_FACE, cw.x, cw.y, (RIG * (900 + (cut * 300 >> 10) + (m * 450 >> 10))) >> 10, S_LITE, stroke); turn(fr, N_FACE, rotation(tilt));
+        /* his mouth: a smile while calm, an O that opens wider the harder he is thrown */
+        if (m < 307) { place(fr, N_SMILE, cw.x, cw.y, RIG, S_LITE, stroke); turn(fr, N_SMILE, rotation(tilt)); hide(fr, N_OMOUTH); }
+        else { place(fr, N_OMOUTH, cw.x, cw.y, (RIG * (768 + (m * 900 >> 10))) >> 10, S_LITE, stroke); turn(fr, N_OMOUTH, rotation(tilt)); hide(fr, N_SMILE); }
         /* hat: brim wider with SPREAD, lifting off on the hardest throws */
         {
             const i32 hl = ((((m * e) >> 10) * (2048 + ((1536 * wild) >> 10))) >> 10) + 600;    /* cowboy units x 1024 */
@@ -313,6 +315,5 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
             place(fr, N_TEAR + i, x * unit + dx, y * unit, len, S_WHITE, fill_and_stroke);
         }
     }
-    for (u32 i = N_SPARE; i < Frame::node_count; ++i) hide(fr, i);
 }
 }
