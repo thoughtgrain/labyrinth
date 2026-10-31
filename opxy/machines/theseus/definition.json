@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "id": "theseus",
+  "name": "Theseus",
+  "parameters": [
+    {
+      "id": "decay",
+      "label": "Decay",
+      "default": 0.27,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "punch",
+      "label": "Punch",
+      "default": 0.43,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "cutoff",
+      "label": "Cutoff",
+      "default": 0.49,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "fm",
+      "label": "FM",
+      "default": 0.24,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "noise",
+      "label": "Noise",
+      "default": 0.12,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 0
+    },
+    {
+      "id": "lfo",
+      "label": "LFO",
+      "default": 0.0,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 1
+    },
+    {
+      "id": "rate",
+      "label": "Rate",
+      "default": 0.49,
+      "mapping": {
+        "kind": "enum",
+        "labels": [
+          "32",
+          "24",
+          "18",
+          "14",
+          "10",
+          "8",
+          "6",
+          "4",
+          "3",
+          "2"
+        ]
+      },
+      "display": "enum",
+      "control": 2
+    },
+    {
+      "id": "tune",
+      "label": "Tune",
+      "control": 3,
+      "default": 0.5,
+      "mapping": {
+        "kind": "linear",
+        "minimum": -24,
+        "maximum": 24
+      },
+      "display": "semitones"
+    }
+  ],
+  "presets": {
+    "Kit": {
+      "decay": 0.27,
+      "punch": 0.43,
+      "cutoff": 0.49,
+      "fm": 0.24,
+      "noise": 0.12,
+      "lfo": 0,
+      "rate": 0.49,
+      "tune": 0.5
+    },
+    "Laser": {
+      "decay": 0.15,
+      "punch": 1.0,
+      "cutoff": 0.8,
+      "fm": 0.12,
+      "noise": 0,
+      "lfo": 0,
+      "rate": 0.49,
+      "tune": 0.5
+    },
+    "Metal": {
+      "decay": 0.67,
+      "punch": 0.24,
+      "cutoff": 0.67,
+      "fm": 0.92,
+      "noise": 0.6,
+      "lfo": 0,
+      "rate": 0.49,
+      "tune": 0.5
+    },
+    "Breathe": {
+      "decay": 0.4,
+      "punch": 0.5,
+      "cutoff": 0.3,
+      "fm": 0.3,
+      "noise": 0.2,
+      "lfo": 0.7,
+      "rate": 0.1,
+      "tune": 0.5
+    }
+  },
+  "resources": {
+    "voiceBytes": 36,
+    "voiceAlignment": 4,
+    "voiceCapacity": 8,
+    "sharedBytes": 8,
+    "outputPeakQ31": 1073741824,
+    "display": {
+      "stateBytes": 136,
+      "stateAlignment": 4,
+      "paths": 2,
+      "points": 64,
+      "nodes": 64,
+      "texts": 16,
+      "palette": 16
+    }
+  },
+  "press": "page"
+}

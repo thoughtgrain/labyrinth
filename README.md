@@ -231,6 +231,10 @@ Under the hood:
 - **theseus draws its helmet in code.** It swaps between five different drawings, which one SVG node can't do. Each head is filled pieces plus outlines, placed by a plain offset (the LFO slide and the hit bob); the left-facing heads are the right-facing ones mirrored. The crest and eyes are drawn in the same frame, so they stick to the head, and the crest's bristles point away from the crown whichever way it faces.
 - **No memcpy/memset.** Same `-fno-tree-loop-distribute-patterns` flag the core uses, on toro and theseus.
 
+## OP-XY port
+
+`opxy/` holds a port of toro and theseus to the teenage engineering OP-XY, built on the Open-XY SDK: the same DSP in C++, and the screens rebuilt as retained greyscale artwork. It is a separate tree under the MIT licence. See [opxy/README.md](opxy/README.md) for what changed and how to build it. meikyu is not ported yet; that README explains why.
+
 ## Build
 
 You need the 3.0.3 SDK (`hundekraft-3.0.3-source`) and a Blackfin cross compiler (GCC 13.3.0 with `bfin-elf-ld`). Copy both folders into the SDK and pack them:

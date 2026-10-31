@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "sdk": "1.7",
+  "kind": "synth",
+  "description": "A DFAM-style percussion voice: the note picks the drum, from kick to metal, and an LFO steps once per hit. A port of theseus for the OP-1."
+}
