@@ -4,7 +4,7 @@
 // toro for the OP-XY: the RIDER screen's state. Matches resources.display in definition.json.
 // Copyright (c) 2026 briannhinton. MIT.
 namespace toro {
-using Frame = opxy::draw::Frame<2, 64, 64, 16, 16>;   // paths, points, nodes, texts, palette
+using Frame = opxy::draw::Frame<2, 64, 125, 16, 16>;   // paths, points, nodes, texts, palette
 struct DisplayState {
     opxy::draw::PageHeader header;     // 20 bytes
     opxy::draw::NoteTracker notes;     // 16 bytes

@@ -14,6 +14,7 @@
  * telescope and the cowboy's legs and lasso arm bend as they did when the OP-1 drew them line by line.
  * The two-page header is the SDK's. Copyright (c) 2026 briannhinton. MIT. */
 #include "display.h"
+#include "nodes.h"
 #include <opxy/q31.hpp>
 
 namespace toro {
@@ -23,12 +24,10 @@ using opxy::u32;
 using namespace opxy::draw;
 
 const i32 CX = 240, BASE = 208, TOP0 = 186;          // the ram's foot and its resting top, pixels
-const i32 RIG = 973;                                  // rig units -> pixels, Q10 (0.95)
-const i32 CS = 1587;                                  // the cowboy's scale, Q10 (1.55)
+const i32 RIG = 1280;                                 // rig units -> pixels, Q10 (1.25)
+const i32 CS = 1178;                                  // the cowboy's scale, Q10 (1.15)
+const i32 XS = 1229;                                  // the bull's extra width, Q10 (1.2): the plate's x is stretched by it
 const i32 HK = 1198;                                  // the head's scale, Q10 (1.17)
-enum { N_LASSO = 0, N_ROPE = 1, N_HDR = 2, N_SHADOW = 10, N_ROD = 11, N_BODY = 12, N_HORN = 13, N_PLATE = 19, N_DECAL = 20,
-       N_EYE = 22, N_HILITE = 24, N_SMILE = 21, N_OMOUTH = 63, N_RING = 26, N_STEAM = 27, N_SPARK = 31, N_PULSE = 37, N_TORSO = 38, N_BELT = 39, N_HEAD = 40, N_FACE = 41,
-       N_BRIM = 42, N_CROWN = 43, N_UPPER = 44, N_FORE = 45, N_THIGH = 46, N_SHIN = 48, N_SPUR = 50, N_TEAR = 52, N_KNOT = 60, N_BOOT = 61 };
 /* palette: 0..7 body entries (near-black fill, outline dim..white); 8..15 solid greys */
 enum { B_DIM = 1, B_DEC = 2, B_MID = 3, B_SEC = 5, B_EDGE = 6, B_LITE = 7, S_BLACK = 8, S_DARK = 9, S_DEC = 10, S_MID = 11, S_SEC = 12, S_EDGE = 13, S_LITE = 14, S_WHITE = 15 };
 
@@ -63,6 +62,13 @@ inline void along(i32 x, i32 y, i32 len_q10, i32 tenths, i32& ox, i32& oy)
     oy = y + ((sn(tenths) * len_q10) >> 10);
 }
 inline u32 hash(u32 s) { return s * 1664525u + 1013904223u; }
+/* a group of parts sharing a pivot: the same transform for each, the artwork's own paint */
+inline void group(Frame& fr, u32 first, u32 count, i32 x, i32 y, i32 scale, i32 tenths)
+{
+    const Turn t = rotation(tenths);
+    for (u32 i = 0; i < count; ++i) { place(fr, first + i, x, y, scale, 0, keep); turn(fr, first + i, t); }
+}
+inline void hide_group(Frame& fr, u32 first, u32 count) { for (u32 i = 0; i < count; ++i) hide(fr, first + i); }
 }
 
 inline void display_reset(DisplayState& st)
@@ -105,7 +111,7 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
 
     /* FOLD: each note lifts the ram and rocks the rig; it keeps rocking while notes play */
     const i32 e = expneg(tq * 5), e2 = expneg(tq * 3);
-    const i32 lift = ((2 * unit + fold * 5 + ((fold * 7 * e) >> 10)) * 2 / 5) * 3 / 2;          // Q10 px
+    const i32 lift = ((2 * unit + fold * 5 + ((fold * 7 * e) >> 10)) * 2 / 5);                  // Q10 px
     const i32 dir = (st.n & 1) ? 1 : -1;
     const bool on = t < 1000;
     const i32 amp = (fold * 104 + ((fold * fold) >> 10) * 261) >> 10;                             // angle units (1/8192 turn)
@@ -121,31 +127,29 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         void atq(i32 lx, i32 ly) { const i32 rx = (lx * RIG) >> 20, ry = (ly * RIG) >> 20; x = cx * unit + (rx * c - ry * s); y = top * unit + (rx * s + ry * c); } } rg = { cx, top, lc, ls, 0, 0 };
 
     /* the ram and its shadow */
-    place(fr, N_ROD, cx * unit, (BASE - 8) * unit, clamp(((BASE - 8) - top) * unit / 16, unit / 2, 2 * unit), S_SEC, fill_and_stroke);
-    turn(fr, N_ROD, rotation(lean / 2));
+    group(fr, N_ROD, N_ROD_COUNT, cx * unit, (BASE - 8) * unit, clamp(((BASE - 8) - top) * unit / 16, unit / 2, 2 * unit), lean / 2);
     { const i32 srx = 40 - ((BASE - top) * 2) / 5; place(fr, N_SHADOW, (cx + ((a * 27) >> 10)) * unit, (BASE + 6) * unit, clamp(srx * unit / 30, unit / 2, 2 * unit), S_BLACK, fill_and_stroke); }
     /* the body, then the plate and its decals (the cowboy sits between them) */
-    place(fr, N_BODY, cx * unit, top * unit, RIG, B_SEC, stroke); turn(fr, N_BODY, rotation(lean));
-    place(fr, N_PLATE, cx * unit, top * unit, RIG, B_EDGE, stroke); turn(fr, N_PLATE, rotation(lean));
-    place(fr, N_DECAL, cx * unit, top * unit, RIG, B_DEC, stroke); turn(fr, N_DECAL, rotation(lean));
+    group(fr, N_BODY, N_BODY_COUNT, cx * unit, top * unit, RIG, lean);
+    group(fr, N_PLATE, N_PLATE_COUNT, cx * unit, top * unit, RIG, lean);
 
     /* SPREAD: the horns grow and swing outward; SHAPE curls the tips inward. One curved tube each, a tip on its end */
     for (int sd = -1; sd <= 1; sd += 2) {
         const u32 side = sd < 0 ? 0 : 1;
         const i32 base = sd < 0 ? 1800 : 0;                                                   /* the left horn is authored along -x */
-        const i32 hs = (RIG * (unit + (sprd * 450 >> 10))) >> 10;                              /* horn scale */
+        const i32 hs = clamp((RIG * (unit + (sprd * 400 >> 10))) >> 10, unit / 2, 2 * unit);        /* horn scale */
         const i32 swing = (sprd * 160 >> 10) - 60;                                             /* down-and-out as SPREAD rises */
         const i32 t0 = lean + sd * swing + base;                                               /* the root's true direction */
-        i32 x, y; rg.at(sd * 20 * HK >> 10, (-14 * HK >> 10) - 30);
+        i32 x, y; rg.at(((sd * 20 * HK >> 10) * XS) >> 10, (-14 * HK >> 10) - 30);
         x = rg.x; y = rg.y;
-        place(fr, N_HORN + 4 + side, x, y, hs, S_SEC, stroke); turn(fr, N_HORN + 4 + side, rotation(t0 + base));
-        place(fr, N_HORN + side, x, y, hs, S_SEC, fill_and_stroke); turn(fr, N_HORN + side, rotation(t0 + base));
+        group(fr, N_HORN_L + side, 1, x, y, hs, t0 + base);
+        group(fr, N_COLLAR_L + side, 1, x, y, hs, t0 + base);
         /* the tube's end, (28, -17) head units, under the horn's turn and scale */
-        const i32 ex = (28 * HK * hs) >> 10, ey = (-17 * HK * hs) >> 10;   /* Q10 px */
+        const i32 ex = (28 * HK * 11 / 10 * hs) >> 10, ey = (-17 * HK * 11 / 10 * hs) >> 10;   /* Q10 px: the tube is authored at 1.1 x HK */
         const i32 c0 = cs(t0 + base), s0 = sn(t0 + base), lx = sd * ex;                        /* the authored end point under the node's turn */
         const i32 tx = x + ((lx * c0 - ey * s0) >> 10), ty = y + ((lx * s0 + ey * c0) >> 10);
         const i32 curl = (shape * 700 >> 10);
-        place(fr, N_HORN + 2 + side, tx, ty, hs, S_LITE, fill_and_stroke); turn(fr, N_HORN + 2 + side, rotation(t0 + base - sd * curl));
+        group(fr, N_TIP_L + side, 1, tx, ty, hs, t0 + base - sd * curl);
     }
     /* CUT: the eye slits open (scale), and a note lights the highlight while CUT is up */
     {
@@ -153,9 +157,9 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         const bool lit = !still && t < 160 && cut > 600;
         for (int sd = -1; sd <= 1; sd += 2) {
             const u32 side = sd < 0 ? 0 : 1;
-            rg.atq(sd * 14250 * HK >> 10, (-3600 * HK >> 10) - 30 * 1024);
-            place(fr, N_EYE + side, rg.x, rg.y, open_, S_LITE, stroke); turn(fr, N_EYE + side, rotation(lean));
-            place(fr, N_HILITE + side, rg.x, rg.y, open_, lit ? S_WHITE : S_MID, fill_and_stroke); turn(fr, N_HILITE + side, rotation(lean));
+            rg.atq(((sd * 14250 * HK >> 10) * XS) >> 10, (-3600 * HK >> 10) - 30 * 1024);
+            group(fr, N_EYE_L + side, 1, rg.x, rg.y, open_, lean);
+            place(fr, N_HILITE_L + side, rg.x, rg.y, open_, lit ? S_WHITE : S_MID, fill_and_stroke); turn(fr, N_HILITE_L + side, rotation(lean));
         }
     }
     /* DRIVE (page 2): each note blasts steam from the vents */
@@ -170,9 +174,9 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     {
         const i32 tau = 123 + ((1434 * res) >> 10), dec = expneg(tq * 1024 / tau);
         const i32 sw = (((717 * dec) >> 10) * sn(ph(t, 1400))) >> 10;                            // 1/8192 turn
-        const i32 R = (RIG * (unit + ((res * 5) >> 3))) >> 10;                                   // ring scale
+        const i32 R = clamp((RIG * (unit + ((res * 5) >> 3))) >> 10, unit / 2, 2 * unit);           // ring scale
         rg.at(0, 6);                                                                             /* hangs from the muzzle */
-        place(fr, N_RING, rg.x, rg.y, R, S_LITE, stroke); turn(fr, N_RING, rotation(lean + sw * 3600 / 8192));
+        group(fr, N_RING, N_RING_COUNT, rg.x, rg.y, R, lean + sw * 3600 / 8192);
     }
     /* FOLD: the hose pulse runs from the hose end to the ram on each note */
     if (!still && t < 400) {
@@ -195,11 +199,11 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
         const i32 wild = (fold * fold) >> 10;
         const i32 rt = -((a * (1843 + 2 * wild)) >> 10) + dir * ((((m * (123 + ((410 * wild) >> 10))) >> 10) * 1304 >> 10) * sn(ph(t, 1100)) >> 10);
         const i32 s9 = sn(ph(t, 900));
-        const i32 up = clamp(((s9 < 0 ? -s9 : s9) * ((m * (3072 + 4 * wild)) >> 10)) >> 10, 0, 14 * unit);   // Q10 px
+        const i32 up = clamp(((s9 < 0 ? -s9 : s9) * ((m * (2560 + 3 * wild)) >> 10)) >> 10, 0, 6 * unit);    // Q10 px
         const i32 slide = dir * ((((m * wild) >> 10) * 7 * sn(ph(t, 900) + 344)) >> 10);
         const i32 tilt = lean + rt * 3600 / 8192;
         const i32 tc = cs(tilt), ts = sn(tilt);
-        rg.at(0, -58);                                                   /* his seat, on the back, his belt at the plate's top edge */
+        rg.at(0, -54);                                                   /* his seat, on the back, his belt at the plate's top edge */
         const i32 sx = rg.x + slide, sy = rg.y - up;
         /* a point in his frame (cowboy units about the seat, Q10 px, under the tilt) */
         struct Cow { i32 sx, sy, c, s; i32 x, y;
@@ -210,39 +214,37 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
             const u32 side = sd < 0 ? 0 : 1;
             const i32 p0 = ph(tt, 1300) + (sd < 0 ? 975 : 0), p1 = p0 + 460;
             /* the OP-1's joints, cowboy units x 1024: hip (7, -55), knee (24 + .., -50 - ..), ankle (33 + .., -38 - ..) */
-            const i32 kx = sd * (24 * unit + ((sn(p0) * ((kick * 2) / 5)) >> 10)), ky = -50 * unit - ((cs(p0) * ((kick * 7) / 20)) >> 10) - 3 * m;
-            const i32 ax = sd * (33 * unit + ((sn(p1) * ((kick * 3) / 4)) >> 10)), ay = -38 * unit - ((cs(p1) * ((kick * 7) / 10)) >> 10) - 4 * m;
+            const i32 kx = sd * (26 * unit + ((sn(p0) * ((kick * 2) / 5)) >> 10)), ky = -50 * unit - ((cs(p0) * ((kick * 7) / 20)) >> 10) - 3 * m;
+            const i32 ax = sd * (37 * unit + ((sn(p1) * ((kick * 3) / 4)) >> 10)), ay = -38 * unit - ((cs(p1) * ((kick * 7) / 10)) >> 10) - 4 * m;
             const i32 base = sd < 0 ? 1800 : 0;                                                   /* the left leg is authored along -x */
             const i32 ta = tilt + angle_of((kx - sd * 7 * unit) >> 6, (ky + 55 * unit) >> 6);      /* true directions on screen */
             const i32 sa = tilt + angle_of((ax - kx) >> 6, (ay - ky) >> 6);
             cw.at(sd * 7, -55);
             const i32 hx = cw.x, hy = cw.y;
-            place(fr, N_THIGH + side, hx, hy, RIG, B_SEC, stroke); turn(fr, N_THIGH + side, rotation(ta + base));
+            group(fr, N_THIGH_L + side, 1, hx, hy, RIG, ta + base);
             i32 jx, jy; along(hx, hy, (((17700 * CS) >> 10) * RIG) >> 10, ta, jx, jy);
-            place(fr, N_SHIN + side, jx, jy, RIG, B_SEC, stroke); turn(fr, N_SHIN + side, rotation(sa + base));
+            group(fr, N_SHIN_L + side, 1, jx, jy, RIG, sa + base);
             /* the boot hangs upright from the ankle in his frame; the spur sits at its heel, spinning with his own clock */
             i32 ex, ey; along(jx, jy, (((15000 * CS) >> 10) * RIG) >> 10, sa, ex, ey);
-            place(fr, N_BOOT + side, ex, ey, RIG, B_SEC, stroke); turn(fr, N_BOOT + side, rotation(tilt));
+            group(fr, side ? N_BOOT_R : N_BOOT_L, N_BOOT_L_COUNT, ex, ey, RIG, tilt);
             const i32 spx = -sd * ((((6600 * 1792) >> 10) * CS >> 10) * RIG >> 10), spy = (((6500 * 1792) >> 10) * CS >> 10) * RIG >> 10;
-            place(fr, N_SPUR + side, ex + ((spx * tc - spy * ts) >> 10), ey + ((spx * ts + spy * tc) >> 10), RIG, S_EDGE, stroke);
-            turn(fr, N_SPUR + side, rotation(still ? 0 : ph(tt, 2000) % 3600));
+            group(fr, side ? N_SPUR_R : N_SPUR_L, N_SPUR_L_COUNT, ex + ((spx * tc - spy * ts) >> 10), ey + ((spx * ts + spy * tc) >> 10), RIG, still ? 0 : ph(tt, 2000) % 3600);
         }
-        place(fr, N_TORSO, sx, sy, RIG, B_SEC, stroke); turn(fr, N_TORSO, rotation(tilt));
-        place(fr, N_BELT, sx, sy, RIG, B_DEC, stroke); turn(fr, N_BELT, rotation(tilt));
-        place(fr, N_HEAD, sx, sy, RIG, B_SEC, stroke); turn(fr, N_HEAD, rotation(tilt));
-        /* his face: eyes wide with CUT and wider as he is thrown (a scale about the head's centre) */
+        group(fr, N_TORSO, N_TORSO_COUNT, sx, sy, RIG, tilt);
+        /* his head, with the eyes wide with CUT and wider as he is thrown (a scale about the head's centre) */
         cw.at(0, -81);
-        place(fr, N_FACE, cw.x, cw.y, (RIG * (900 + (cut * 300 >> 10) + (m * 450 >> 10))) >> 10, S_LITE, stroke); turn(fr, N_FACE, rotation(tilt));
+        group(fr, N_HEAD, N_HEAD_COUNT, cw.x, cw.y, RIG, tilt);
+        group(fr, N_EYES, N_EYES_COUNT, cw.x, cw.y, clamp((RIG * (900 + (cut * 300 >> 10) + (m * 450 >> 10))) >> 10, unit / 2, 2 * unit), tilt);
         /* his mouth: a smile while calm, an O that opens wider the harder he is thrown */
-        if (m < 307) { place(fr, N_SMILE, cw.x, cw.y, RIG, S_LITE, stroke); turn(fr, N_SMILE, rotation(tilt)); hide(fr, N_OMOUTH); }
-        else { place(fr, N_OMOUTH, cw.x, cw.y, (RIG * (768 + (m * 900 >> 10))) >> 10, S_LITE, stroke); turn(fr, N_OMOUTH, rotation(tilt)); hide(fr, N_SMILE); }
+        if (m < 307) { group(fr, N_SMILE, 1, cw.x, cw.y, RIG, tilt); hide(fr, N_OMOUTH); }
+        else { group(fr, N_OMOUTH, 1, cw.x, cw.y, clamp((RIG * (768 + (m * 900 >> 10))) >> 10, unit / 2, 2 * unit), tilt); hide(fr, N_SMILE); }
         /* hat: brim wider with SPREAD, lifting off on the hardest throws */
         {
             const i32 hl = ((((m * e) >> 10) * (2048 + ((1536 * wild) >> 10))) >> 10) + 600;    /* cowboy units x 1024 */
             cw.at(0, -87);
             const i32 hx = cw.x - ((ts * ((hl * CS >> 10) * RIG >> 10)) >> 10), hy = cw.y - ((tc * ((hl * CS >> 10) * RIG >> 10)) >> 10);
-            place(fr, N_BRIM, hx, hy, (RIG * (820 + (sprd * 460 >> 10))) >> 10, B_LITE, stroke); turn(fr, N_BRIM, rotation(tilt - (shape * 60 >> 10) * dir));
-            place(fr, N_CROWN, hx, hy, RIG, B_LITE, stroke); turn(fr, N_CROWN, rotation(tilt));
+            group(fr, N_BRIM, N_BRIM_COUNT, hx, hy, clamp((RIG * (820 + (sprd * 460 >> 10))) >> 10, unit / 2, 2 * unit), tilt - (shape * 60 >> 10) * dir);
+            group(fr, N_CROWN, N_CROWN_COUNT, hx, hy, RIG, tilt);
         }
         /* the lasso arm: rest at RES 0; up with a loop that grows and spins as RES rises */
         {
@@ -256,9 +258,9 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
             const i32 ua = tilt + angle_of((elx - 8600) >> 6, (ely + 71000) >> 6), fa = tilt + angle_of((hx - elx) >> 6, (hy - ely) >> 6);
             cw.at(8600 >> 10, -71);
             const i32 shx = cw.x, shy = cw.y;
-            place(fr, N_UPPER, shx, shy, RIG, B_SEC, stroke); turn(fr, N_UPPER, rotation(ua));
+            group(fr, N_UPPER, 1, shx, shy, RIG, ua);
             i32 ex, ey; along(shx, shy, (((9000 * CS) >> 10) * RIG) >> 10, ua, ex, ey);
-            place(fr, N_FORE, ex, ey, RIG, B_SEC, stroke); turn(fr, N_FORE, rotation(fa));
+            group(fr, N_FORE, N_FORE_COUNT, ex, ey, RIG, fa);
             i32 px, py; along(ex, ey, (((10000 * CS) >> 10) * RIG) >> 10, fa, px, py);                   /* the hand */
             if (res > 31) {
                 const i32 R = (((3000 + res * 29) * (614 + ((410 * dec) >> 10))) >> 10) * CS >> 10;    /* loop radius, cowboy units x 1024 -> rig x 1024 */
@@ -279,7 +281,7 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
                 place(fr, N_LASSO, lx, ly, unit, S_LITE, stroke); turn(fr, N_LASSO, rotation(0));
                 /* the knot rides the loop; the rope is a quadratic from the hand to it, reshaped as a thin ribbon */
                 const i32 kx = lx + ((cs(spin) * Rp) >> 10), ky = ly + ((sn(spin) * ry) >> 10);
-                place(fr, N_KNOT, kx, ky, unit, S_LITE, stroke);
+                group(fr, N_KNOT, 1, kx, ky, unit, 0);
                 const i32 mx = (px + kx) / 2, my = (py + ky) / 2;
                 const i32 qx = mx + 2 * unit, qy = (py > ky ? py : ky) + 2 * unit;
                 const u32 rkey = 1u + static_cast<u32>((kx - px) >> 9) * 4096u + static_cast<u32>((ky - py) >> 9);
