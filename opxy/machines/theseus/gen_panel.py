@@ -20,8 +20,10 @@ import math
 from pathlib import Path
 
 K = 0.5523
-SHELL, HEAD, EDGE, DEC, LITE, BLACK, SEC = '#141414', '#1E1E1E', '#B9B9C9', '#625D77', '#F0F0F0', '#000000', '#9A9A9A'
-HELM, HELM_DARK, SLOT, BRONZE = '#4A4A4A', '#333333', '#060608', '#8C8C8C'
+# the print's palette, inverted for the black screen: light fills, ink detail, a cream for highlights and the crest
+INK, PAPER, CREAM, DIM, LITE, BLACK, SEC = '#0A0A0A', '#C9C9C9', '#E2E2E2', '#8A8A8A', '#F0F0F0', '#000000', '#A4A4A4'
+SHELL, HEAD, EDGE, DEC = PAPER, CREAM, INK, SEC
+HELM, HELM_DARK, SLOT, BRONZE = PAPER, INK, INK, CREAM
 SX, SY = 1.6, 1.3             # the kit's stretch: OP-1 units -> pixels
 HERE = Path(__file__).resolve().parent
 
@@ -81,6 +83,27 @@ def bez_ribbon(p0, p1, p2, p3, w, n=10):
     return ribbon(bezier(p0, p1, p2, p3, n), w)
 
 
+def hatch(pts_a, pts_b, n, w=0.9, col=None):
+    out = []
+    for k in range(n):
+        u = (k + 0.5) / n
+        i = min(int(u * (len(pts_a) - 1)), len(pts_a) - 2)
+        t = u * (len(pts_a) - 1) - i
+        ax, ay = pts_a[i][0] + (pts_a[i + 1][0] - pts_a[i][0]) * t, pts_a[i][1] + (pts_a[i + 1][1] - pts_a[i][1]) * t
+        bx, by = pts_b[i][0] + (pts_b[i + 1][0] - pts_b[i][0]) * t, pts_b[i][1] + (pts_b[i + 1][1] - pts_b[i][1]) * t
+        out.append((ribbon([(ax, ay), (bx, by)], w), col or INK, col or INK, 0.3))
+    return out
+
+
+def star(cx, cy, r, points=4, inner=0.28):
+    pts = []
+    for k in range(points * 2):
+        a = -math.pi / 2 + k * math.pi / points
+        rr = r if k % 2 == 0 else r * inner
+        pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr))
+    return poly(pts)
+
+
 def P(x, y):                                      # OP-1 kit units -> pixels
     return ((x - 160) * SX + 240, (y - 8) * SY + 40)
 
@@ -128,51 +151,61 @@ def main():
     S = []
     # stands: hi-hat (94), ride (232), snare (122), floor tom legs, kick spurs; with tripod feet
     for a, b in (((94, 80), (94, 132)), ((232, 69), (234, 131)), ((122, 107), (122, 131)), ((197, 120), (195, 140)), ((217, 120), (219, 140)), ((143, 126), (136, 140)), ((177, 126), (184, 140))):
-        S.append(line(P(*a), P(*b), DEC, 2))
+        S.append(line(P(*a), P(*b), SEC, 2.2))
     for c in ((87, 140), (94, 131), (101, 140)), ((227, 140), (234, 130), (241, 140)), ((115, 140), (122, 130), (129, 140)):
-        S.append(static(poly([P(*p) for p in c], False), None, DEC, 1.5))
+        S.append(static(poly([P(*p) for p in c], False), None, SEC, 1.8))
         for p in (c[0], c[2]):                                       # rubber feet
-            x, y = P(*p); S.append(static(ellipse(x, y, 2.2, 1.4), DEC, DEC, 0.5))
+            x, y = P(*p); S.append(static(ellipse(x, y, 2.6, 1.6), SEC, SEC, 0.5))
     # the hi-hat's clutch and the ride stand's tilter
     x, y = P(94, 84); S.append(static(poly([(x - 2.5, y), (x + 2.5, y), (x + 2.5, y + 5), (x - 2.5, y + 5)]), SEC, SEC, 0.5))
     x, y = P(233, 72); S.append(static(ellipse(x, y, 2.4, 2.4), SEC, SEC, 0.5))
     # the drummer's cuirass: the breastplate, its central ridge, two shoulder plates and a skirt of pteruges strips
     cx, cy = P(158, 95)
-    S.append(static(f'M{f(cx - 27)},{f(cy)} C{f(cx - 24)},{f(cy - 10)} {f(cx - 13)},{f(cy - 13)} {f(cx)},{f(cy - 13)} C{f(cx + 13)},{f(cy - 13)} {f(cx + 24)},{f(cy - 10)} {f(cx + 27)},{f(cy)} L{f(cx + 20)},{f(cy + 17)} L{f(cx - 20)},{f(cy + 17)} Z', SHELL, DEC, 1.5))
-    S.append(static(ribbon([(cx, cy - 10), (cx, cy + 14)], 1.2), DEC, DEC, 0.5))
+    S.append(static(f'M{f(cx - 27)},{f(cy)} C{f(cx - 24)},{f(cy - 10)} {f(cx - 13)},{f(cy - 13)} {f(cx)},{f(cy - 13)} C{f(cx + 13)},{f(cy - 13)} {f(cx + 24)},{f(cy - 10)} {f(cx + 27)},{f(cy)} L{f(cx + 20)},{f(cy + 17)} L{f(cx - 20)},{f(cy + 17)} Z', PAPER, INK, 2))
+    S.append(static(ribbon([(cx, cy - 10), (cx, cy + 14)], 1.4), INK, INK, 0.3))
     for sd in (-1, 1):
-        S.append(static(bez_ribbon((cx + sd * 10, cy - 11), (cx + sd * 16, cy - 2), (cx + sd * 14, cy + 6), (cx + sd * 18, cy + 15), 1.0, 8), DEC, DEC, 0.5))   # muscle lines
-        S.append(static(poly([(cx + sd * 20, cy - 9), (cx + sd * 30, cy - 5), (cx + sd * 29, cy + 2), (cx + sd * 22, cy + 1)]), HELM_DARK, DEC, 1.2))    # shoulder plates
+        S.append(static(bez_ribbon((cx + sd * 10, cy - 11), (cx + sd * 16, cy - 2), (cx + sd * 14, cy + 6), (cx + sd * 18, cy + 15), 1.2, 8), INK, INK, 0.3))   # muscle lines
+        S.append(static(poly([(cx + sd * 20, cy - 9), (cx + sd * 30, cy - 5), (cx + sd * 29, cy + 2), (cx + sd * 22, cy + 1)]), CREAM, INK, 1.4))    # shoulder plates
+        for d_, fill, stroke, w in hatch([(cx + sd * 22, cy + 3), (cx + sd * 20, cy + 10), (cx + sd * 19, cy + 15)], [(cx + sd * 17, cy + 3), (cx + sd * 15.5, cy + 9), (cx + sd * 14.5, cy + 14)], 4, 1.0):
+            S.append(static(d_, fill, stroke, w))                                                                           # flank hatching
     for k in range(-3, 4):
         x0 = cx + k * 5.6
-        S.append(static(poly([(x0 - 2.2, cy + 17), (x0 + 2.2, cy + 17), (x0 + 2.6, cy + 26), (x0 - 2.6, cy + 26)]), HELM_DARK, DEC, 1))                     # pteruges
+        S.append(static(poly([(x0 - 2.2, cy + 17), (x0 + 2.2, cy + 17), (x0 + 2.6, cy + 26), (x0 - 2.6, cy + 26)]), PAPER, INK, 1.2))                      # pteruges
+        S.append(static(ribbon([(x0, cy + 19), (x0, cy + 24)], 0.9), INK, INK, 0.3))
+    # ornaments: starbursts in the print's corners
+    for sx, sy in ((36, 64), (444, 64)):
+        S.append(static(star(sx, sy, 9, 4, 0.3), CREAM, CREAM, 0.5))
+        S.append(static(star(sx + 15, sy + 14, 4, 4, 0.3), PAPER, PAPER, 0.5))
+        S.append(static(star(sx - 13, sy + 16, 3, 4, 0.3), PAPER, PAPER, 0.5))
     # drums: snare, floor tom, rack tom: shell, lugs, hoop ring, head
     for dcx, dcy, rx, ry, h, lugs in ((122, 98, 14, 4, 8, 5), (207, 108, 13, 4, 16, 5), (190, 88, 11, 3.5, 8, 4)):
         x, y = P(dcx, dcy)
-        S.append(static(shell(x, y, rx * SX, ry * SY, h * SY), SHELL, EDGE, 1.5))
+        S.append(static(shell(x, y, rx * SX, ry * SY, h * SY), PAPER, INK, 1.6))
         for k in range(lugs):
             u = (k + 0.5) / lugs
             lx = x - rx * SX + 2 * rx * SX * u
             ly = y + math.sqrt(max(0, 1 - (2 * u - 1) ** 2)) * ry * SY + 3
-            S.append(static(poly([(lx - 1.4, ly), (lx + 1.4, ly), (lx + 1.4, ly + 4.5), (lx - 1.4, ly + 4.5)]), SEC, SEC, 0.5))
-        S.append(static(ellipse(x, y, rx * SX, ry * SY), HEAD, EDGE, 1.5))
-        S.append(static(ellipse(x, y, rx * SX - 3, ry * SY - 1.2), None, DEC, 0.8))
-    S.append(line(P(176, 99), P(186, 96), EDGE, 1.5))                                           # the rack tom's mount
+            S.append(static(poly([(lx - 1.5, ly), (lx + 1.5, ly), (lx + 1.5, ly + 4.8), (lx - 1.5, ly + 4.8)]), INK, INK, 0.5))
+        S.append(static(ellipse(x, y, rx * SX, ry * SY), CREAM, INK, 1.6))
+        S.append(static(ellipse(x, y, rx * SX - 3, ry * SY - 1.2), None, INK, 1))
+    S.append(line(P(176, 99), P(186, 96), SEC, 2))                                              # the rack tom's mount
     kx, ky = P(160, 114)
-    S.append(static(ellipse(kx, ky, 22 * SX, 22 * SY), SHELL, EDGE, 2))
-    S.append(static(ellipse(kx, ky, 18.5 * SX, 18.5 * SY), None, DEC, 1))
+    S.append(static(ellipse(kx, ky, 22 * SX, 22 * SY), PAPER, INK, 2.2))
+    S.append(static(ellipse(kx, ky, 18.5 * SX, 18.5 * SY), CREAM, INK, 1.4))
+    for d_, fill, stroke, w in hatch([(kx + 14 * SX, ky + 6 * SY), (kx + 9 * SX, ky + 13 * SY), (kx + 2 * SX, ky + 17 * SY)], [(kx + 17 * SX, ky + 7 * SY), (kx + 11 * SX, ky + 15.5 * SY), (kx + 3 * SX, ky + 20 * SY)], 6, 1.1):
+        S.append(static(d_, fill, stroke, w))                                                   # the kick's shaded rim
     for k in range(8):                                                                           # kick hoop claws
         a = k * math.pi / 4 + math.pi / 8
         lx, ly = kx + math.cos(a) * 20.2 * SX, ky + math.sin(a) * 20.2 * SY
-        S.append(static(ellipse(lx, ly, 1.8, 1.8), SEC, SEC, 0.5))
-    S.append(static(ellipse(kx, ky, 4.5, 4.5), None, DEC, 1))                                  # the port
+        S.append(static(ellipse(lx, ly, 1.9, 1.9), INK, INK, 0.5))
+    S.append(static(ellipse(kx, ky, 4.5, 4.5), INK, INK, 1))                                   # the port
     # the pedal: footboard, chain, and the beater's hinge block
-    S.append(static(ribbon([P(158, 141.5), P(174, 139.5)], 2.6), LITE, LITE, 0.5))
+    S.append(static(ribbon([P(158, 141.5), P(174, 139.5)], 3), CREAM, CREAM, 0.5))
     bx, by = P(166, 139)
-    S.append(static(poly([(bx - 3, by - 2), (bx + 3, by - 2), (bx + 3, by + 2), (bx - 3, by + 2)]), SEC, SEC, 0.5))
+    S.append(static(poly([(bx - 3, by - 2), (bx + 3, by - 2), (bx + 3, by + 2), (bx - 3, by + 2)]), PAPER, INK, 0.8))
     # the bottom hat, static (the top one is a node)
     hx, hy = P(94, 77)
-    S.append(static(ellipse(hx, hy + 4, 13 * SX, 2.6 * SY), None, DEC, 1.5))
+    S.append(static(ellipse(hx, hy + 4, 13 * SX, 2.6 * SY), PAPER, INK, 1.2))
 
     # ---- the five heads: the OP-1's helmet geometry (helmet units, origin at the neck pivot, +x faces right), each a
     # group: bowl, stalk, holders, brow band, cheek rivets and the face openings. Left-facing heads mirror the right ----
@@ -186,62 +219,62 @@ def main():
                          L(m(21, 9)), L(m(17, 10.5)), L(m(14, 4.5)), L(m(12.5, 8)), bez(m(15, 12), m(18, 16), m(19, 20)), L(m(12, 22)), bez(m(6, 22), m(0, 18), m(-4, 16)),
                          bez(m(-8, 18), m(-12, 18), m(-16, 14)), 'Z'])
         stalk = ' '.join([M(m(12, -22)), bez(m(7, -38), m(-17, -39), m(-28, -13)), L(m(-26.5, -12.5)), bez(m(-16, -36), m(7, -35), m(10.5, -21.5)), 'Z'])
-        return [(bowl, HELM, EDGE, 1.5), (stalk, BRONZE, BRONZE, 0.8),
-                (poly([m(8, -20), m(12, -24), m(15, -19)]), BRONZE, EDGE, 1), (poly([m(-19, -13), m(-25, -14), m(-20, -9)]), BRONZE, EDGE, 1),
-                (ribbon([m(-17, 2), m(-8, -2), m(4, -3), m(11, -4.4)], 1.2), HELM_DARK, HELM_DARK, 0.5),                   # brow band
+        return [(bowl, HELM, INK, 2.2), (stalk, CREAM, INK, 0.8),
+                (poly([m(8, -20), m(12, -24), m(15, -19)]), CREAM, INK, 1), (poly([m(-19, -13), m(-25, -14), m(-20, -9)]), CREAM, INK, 1),
+                (ribbon([m(-17, 2), m(-8, -2), m(4, -3), m(11, -4.4)], 1.4), INK, INK, 0.3),                   # brow band
                 (poly([m(*p) for p in ((6.5, -7), (11, -10), (19.6, -9.6), (19.6, -5), (11, -4.4))]), SLOT, SLOT, 0.5),     # eye slot
                 (poly([m(*p) for p in ((14.6, -5), (17, -5), (15.6, 4.8), (13.4, 4.8))]), SLOT, SLOT, 0.5),                # nose guard gap
-                (ellipse(*m(-12, 10), 1.3, 1.3), BRONZE, BRONZE, 0.5), (ellipse(*m(-6, 14), 1.3, 1.3), BRONZE, BRONZE, 0.5),   # cheek rivets
-                (ellipse(*m(15, 15), 1.3, 1.3), BRONZE, BRONZE, 0.5)]
+                (ellipse(*m(-12, 10), 1.4, 1.4), INK, INK, 0.5), (ellipse(*m(-6, 14), 1.4, 1.4), INK, INK, 0.5),   # cheek rivets
+                (ellipse(*m(15, 15), 1.4, 1.4), INK, INK, 0.5)] + hatch([m(-14, -14), m(-17, -6), m(-18, 4)], [m(-10, -13), m(-13, -6), m(-14, 3)], 4, 1.0)
     def three_quarter(sign):
         m = lambda x, y: (x * sign, y)
         bowl = ' '.join([M(m(-19, -3)), bez(m(-19.5, -17), m(-10, -24.5), m(1, -24)), bez(m(12, -23.5), m(18.5, -16), m(18.5, -3)), L(m(19, 7)),
                          bez(m(18.5, 15), m(15, 20), m(9, 22.5)), L(m(6, 22.5)), L(m(6, 9)), L(m(3, 9)), L(m(3, 23)), L(m(-3, 22)), bez(m(-10, 21), m(-16, 18), m(-18, 10)), 'Z'])
         stalk = ' '.join([M(m(12, -21)), bez(m(6, -35), m(-14, -36), m(-23, -14)), L(m(-21.5, -13.5)), bez(m(-13, -33), m(6, -32), m(10.5, -20.5)), 'Z'])
-        return [(bowl, HELM, EDGE, 1.5), (stalk, BRONZE, BRONZE, 0.8),
-                (poly([m(9, -19.5), m(12.5, -23), m(15, -18.5)]), BRONZE, EDGE, 1), (poly([m(-17, -12), m(-22, -14), m(-17.5, -9)]), BRONZE, EDGE, 1),
-                (ribbon([m(-18, -4), m(-6, -5), m(8, -6), m(17.5, -4.5)], 1.2), HELM_DARK, HELM_DARK, 0.5),
+        return [(bowl, HELM, INK, 2.2), (stalk, CREAM, INK, 0.8),
+                (poly([m(9, -19.5), m(12.5, -23), m(15, -18.5)]), CREAM, INK, 1), (poly([m(-17, -12), m(-22, -14), m(-17.5, -9)]), CREAM, INK, 1),
+                (ribbon([m(-18, -4), m(-6, -5), m(8, -6), m(17.5, -4.5)], 1.4), INK, INK, 0.3),
                 (poly([m(*p) for p in ((6, -9.6), (16.5, -9), (17.5, -4.5), (6, -4.2))]), SLOT, SLOT, 0.5),
                 (poly([m(*p) for p in ((-9, -8.5), (3, -9.6), (3, -4.2), (-8.5, -4.2))]), SLOT, SLOT, 0.5),
                 (poly([m(*p) for p in ((3, 9), (6, 9), (6, 22.5), (3, 23))]), SLOT, SLOT, 0.5),
-                (ellipse(*m(-13, 12), 1.3, 1.3), BRONZE, BRONZE, 0.5), (ellipse(*m(14, 13), 1.3, 1.3), BRONZE, BRONZE, 0.5)]
+                (ellipse(*m(-13, 12), 1.4, 1.4), INK, INK, 0.5), (ellipse(*m(14, 13), 1.4, 1.4), INK, INK, 0.5)] + hatch([m(-16, -12), m(-18, -4)], [m(-12, -12), m(-14, -4)], 4, 1.0)
     def front():
         bowl = ' '.join([M((-19.5, -4)), bez((-19.5, -17), (-11, -24), (0, -24)), bez((11, -24), (19.5, -17), (19.5, -4)), L((20, 6)), bez((19, 16), (14, 21), (7, 23)),
                          L((3, 23)), L((3, 9)), L((-3, 9)), L((-3, 23)), L((-7, 23)), bez((-14, 21), (-19, 16), (-20, 6)), 'Z'])
         stalk = ' '.join([M((-11, -20)), bez((-6, -29), (6, -29), (11, -20)), L((9.5, -19)), bez((5.5, -27), (-5.5, -27), (-9.5, -19)), 'Z'])
-        return [(bowl, HELM, EDGE, 1.5), (stalk, BRONZE, BRONZE, 0.8),
-                (poly([(-13, -18), (-10.5, -22), (-7.5, -18.5)]), BRONZE, EDGE, 1), (poly([(13, -18), (10.5, -22), (7.5, -18.5)]), BRONZE, EDGE, 1),
-                (ribbon([(-19.5, -3.6), (19.5, -3.6)], 1.2), HELM_DARK, HELM_DARK, 0.5),
+        return [(bowl, HELM, INK, 2.2), (stalk, CREAM, INK, 0.8),
+                (poly([(-13, -18), (-10.5, -22), (-7.5, -18.5)]), CREAM, INK, 1), (poly([(13, -18), (10.5, -22), (7.5, -18.5)]), CREAM, INK, 1),
+                (ribbon([(-19.5, -3.6), (19.5, -3.6)], 1.4), INK, INK, 0.3),
                 (poly([(15.5, -9), (3, -10), (3, -4.5), (14.5, -4)]), SLOT, SLOT, 0.5), (poly([(-15.5, -9), (-3, -10), (-3, -4.5), (-14.5, -4)]), SLOT, SLOT, 0.5),
                 (poly([(-3, 9), (3, 9), (3, 23), (-3, 23)]), SLOT, SLOT, 0.5),
-                (ellipse(-14, 13, 1.3, 1.3), BRONZE, BRONZE, 0.5), (ellipse(14, 13, 1.3, 1.3), BRONZE, BRONZE, 0.5)]
+                (ellipse(-14, 13, 1.4, 1.4), INK, INK, 0.5), (ellipse(14, 13, 1.4, 1.4), INK, INK, 0.5)] + hatch([(-18, -14), (-19.5, -6)], [(-14.5, -13), (-16, -6)], 4, 1.0)
     for name, parts in (('HEAD_0', profile(-1)), ('HEAD_1', three_quarter(-1)), ('HEAD_2', front()), ('HEAD_3', three_quarter(1)), ('HEAD_4', profile(1))):
         Pn.group(name, parts)
     # ---- crest bristles: a unit bristle pointing -y with a flat tip, placed along the stalk ----
-    Pn.group('BRISTLE', [('M-0.9,0 L0.9,0 L0.35,-9 L-0.35,-9 Z', LITE, LITE, 0.4)] * 12)
+    Pn.group('BRISTLE', [('M-1.0,0 L1.0,0 L0.4,-9 L-0.4,-9 Z', CREAM, CREAM, 0.4)] * 12)
     # ---- eyes: a disc each; rays: six spokes around the eye on strong hits ----
-    Pn.node('EYE_L', ellipse(0, 0, 2.2, 2.2), LITE, LITE, 0.5)
-    Pn.node('EYE_R', ellipse(0, 0, 2.2, 2.2), LITE, LITE, 0.5)
+    Pn.node('EYE_L', ellipse(0, 0, 2.3, 2.3), '#FFFFFF', '#FFFFFF', 0.5)
+    Pn.node('EYE_R', ellipse(0, 0, 2.3, 2.3), '#FFFFFF', '#FFFFFF', 0.5)
     Pn.group('RAYS', [(ribbon([(math.cos(a) * 3.5, math.sin(a) * 3.5), (math.cos(a) * 7.5, math.sin(a) * 7.5)], 1.2), LITE, LITE, 0.5)
                       for a in [k * math.pi / 3 + math.pi / 6 for k in range(6)]])
     # ---- arms: upper arm (pivot the shoulder, +x) with a bracer band; forearm + stick + tip (pivot the elbow) ----
     for name in ('UARM_L', 'UARM_R'):
-        Pn.group(name, [(ribbon([(0, 0), (30, 0)], 5.5), HELM, EDGE, 1.5), (ribbon([(3, -3.2), (3, 3.2)], 2), BRONZE, BRONZE, 0.5)])
+        Pn.group(name, [(ribbon([(0, 0), (30, 0)], 5.5), PAPER, INK, 1.4), (ribbon([(3, -3.2), (3, 3.2)], 2.2), INK, INK, 0.3), (ribbon([(10, -1.6), (24, -1.6)], 0.9), INK, INK, 0.3)])
     for name in ('FARM_L', 'FARM_R'):
-        Pn.group(name, [(ribbon([(0, 0), (26, 0)], 4.5), HELM, EDGE, 1.5), (ribbon([(20, -2.6), (20, 2.6)], 2), BRONZE, BRONZE, 0.5),   # bracer
-                        (ribbon([(22, 0), (58, 0)], 2.4), '#D6D6D6', EDGE, 1), (ellipse(58.8, 0, 1.9, 1.9), LITE, LITE, 0.5)])            # stick and tip
+        Pn.group(name, [(ribbon([(0, 0), (26, 0)], 4.5), PAPER, INK, 1.4), (ribbon([(20, -2.6), (20, 2.6)], 2.2), INK, INK, 0.3),   # bracer
+                        (ribbon([(22, 0), (58, 0)], 2.4), CREAM, INK, 0.8), (ellipse(58.8, 0, 2.0, 2.0), CREAM, INK, 0.8)])             # stick and tip
     # ---- kick beater (pivot the pedal, pointing -y): shaft and felt head; the thump diamond ----
-    Pn.group('BEATER', [(ribbon([(0, 0), (0, -24)], 2), LITE, LITE, 1), (ellipse(0, -25.5, 3.6, 3.6), '#2A2A2A', LITE, 1.2)])
-    Pn.node('THUMP', 'M-7,0 L0,-7 L7,0 L0,7 Z', None, LITE, 1)
+    Pn.group('BEATER', [(ribbon([(0, 0), (0, -24)], 2.2), CREAM, CREAM, 0.5), (ellipse(0, -25.5, 3.8, 3.8), PAPER, INK, 1.2)])
+    Pn.node('THUMP', 'M-7,0 L0,-7 L7,0 L0,7 Z', None, CREAM, 1.4)
     # ---- hi-hat top and ride cymbal: a plate, a bell, and a lathe ring; wobble per frame ----
     def cymbal(rx, ry):
-        return [(ellipse(0, 0, rx, ry), '#101010', EDGE, 1.5), (ellipse(0, -0.6, rx * 0.55, ry * 0.55), None, DEC, 0.8),
-                ('M-5,-1 C-5,-5 5,-5 5,-1 L4,-0.6 C4,-4 -4,-4 -4,-0.6 Z', None, EDGE, 1.5)]
+        return [(ellipse(0, 0, rx, ry), PAPER, INK, 1.4), (ellipse(0, -0.6, rx * 0.55, ry * 0.55), None, INK, 1), (ellipse(0, -0.3, rx * 0.8, ry * 0.8), None, INK, 0.7),
+                ('M-5,-1 C-5,-5 5,-5 5,-1 L4,-0.6 C4,-4 -4,-4 -4,-0.6 Z', CREAM, INK, 1)]
     Pn.group('HAT', cymbal(13 * SX, 3 * SY))
     Pn.group('CYM', cymbal(17 * SX, 3 * SY))
     # ---- ripple rings (scaled per frame), sizzle specks, sway arcs ----
-    Pn.group('RING', [(ellipse(0, 0, 16, 16), None, LITE, 1)] * 8)
-    Pn.group('SPECK', [(poly([(0, -1.6), (1.6, 0), (0, 1.6), (-1.6, 0)]), LITE, LITE, 0.5)] * 8)
+    Pn.group('RING', [(ellipse(0, 0, 16, 16), None, CREAM, 1.2)] * 8)
+    Pn.group('SPECK', [(star(0, 0, 2.6, 4, 0.3), CREAM, CREAM, 0.5)] * 8)
     Pn.group('ARC', [(ribbon([(math.cos(a) * 30, math.sin(a) * 30) for a in [-0.5 + k * 0.1 for k in range(11)]], 1.2), None, LITE, 1)] * 2)
 
     # ---- write ----
