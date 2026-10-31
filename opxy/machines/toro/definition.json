@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "id": "toro",
+  "name": "Toro",
+  "parameters": [
+    {
+      "id": "spread",
+      "label": "Spread",
+      "default": 0.06,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 1.0,
+        "maximum": 1.5
+      },
+      "display": "ratio"
+    },
+    {
+      "id": "fold",
+      "label": "Fold",
+      "default": 0.18,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "cutoff",
+      "label": "Cutoff",
+      "default": 0.55,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "res",
+      "label": "Res",
+      "default": 0.24,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "shape",
+      "label": "Shape",
+      "default": 0.0,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 0
+    },
+    {
+      "id": "noise",
+      "label": "Noise",
+      "default": 0.0,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 1
+    },
+    {
+      "id": "drive",
+      "label": "Drive",
+      "default": 0.0,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 2
+    },
+    {
+      "id": "aphx",
+      "label": "Aphx",
+      "default": 0.0,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 3
+    }
+  ],
+  "presets": {
+    "Clean": {
+      "spread": 0.06,
+      "fold": 0.18,
+      "cutoff": 0.55,
+      "res": 0.24,
+      "shape": 0,
+      "noise": 0,
+      "drive": 0,
+      "aphx": 0
+    },
+    "Bull": {
+      "spread": 0.3,
+      "fold": 0.6,
+      "cutoff": 0.7,
+      "res": 0.5,
+      "shape": 0.2,
+      "noise": 0.1,
+      "drive": 0.5,
+      "aphx": 0
+    },
+    "Drift": {
+      "spread": 0.06,
+      "fold": 0.25,
+      "cutoff": 0.6,
+      "res": 0.3,
+      "shape": 0,
+      "noise": 0,
+      "drive": 0.2,
+      "aphx": 0.3
+    },
+    "Labyrinth": {
+      "spread": 0.5,
+      "fold": 0.9,
+      "cutoff": 0.8,
+      "res": 0.7,
+      "shape": 0.5,
+      "noise": 0.3,
+      "drive": 0.8,
+      "aphx": 1.0
+    }
+  },
+  "resources": {
+    "voiceBytes": 32,
+    "voiceAlignment": 4,
+    "voiceCapacity": 8,
+    "sharedBytes": 0,
+    "outputPeakQ31": 1073741824,
+    "display": {
+      "stateBytes": 64,
+      "stateAlignment": 4,
+      "paths": 2,
+      "points": 64,
+      "nodes": 48,
+      "texts": 16,
+      "palette": 16
+    }
+  },
+  "press": "page"
+}

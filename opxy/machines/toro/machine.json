@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "sdk": "1.7",
+  "kind": "synth",
+  "description": "A two-oscillator voice with a wavefolder, a resonant low-pass and APHX, key-tracked drift that turns to chaos. A port of toro for the OP-1."
+}

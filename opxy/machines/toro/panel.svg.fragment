@@ -1,0 +1,89 @@
+<g id="toro_panel">
+<!-- SDK two-page header: keep this block before machine artwork below y=38. -->
+<path d="M0,0 L480,0 L480,38 L0,38 Z" fill="#000000"/>
+<path id="toro_node_2" transform="matrix(1 0 0 1 0 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#000000" stroke="#000000" stroke-width="0.5"/>
+<path id="toro_node_3" transform="matrix(1 0 0 1 60 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#323232" stroke="#323232" stroke-width="0.5"/>
+<path id="toro_node_4" transform="matrix(1 0 0 1 120 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#4B4B4B" stroke="#4B4B4B" stroke-width="0.5"/>
+<path id="toro_node_5" transform="matrix(1 0 0 1 180 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#646464" stroke="#646464" stroke-width="0.5"/>
+<path id="toro_node_6" transform="matrix(1 0 0 1 240 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#7D7D7D" stroke="#7D7D7D" stroke-width="0.5"/>
+<path id="toro_node_7" transform="matrix(1 0 0 1 300 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#969696" stroke="#969696" stroke-width="0.5"/>
+<path id="toro_node_8" transform="matrix(1 0 0 1 360 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#AFAFAF" stroke="#AFAFAF" stroke-width="0.5"/>
+<path id="toro_node_9" transform="matrix(1 0 0 1 420 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="#CDCDCD" stroke="#CDCDCD" stroke-width="0.5"/>
+<text id="toro_text_0" transform="matrix(1 0 0 1 5 10)" fill="#CBCBCB" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_1" transform="matrix(1 0 0 1 125 10)" fill="#CBCBCB" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_2" transform="matrix(1 0 0 1 245 10)" fill="#000000" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_3" transform="matrix(1 0 0 1 365 10)" fill="#000000" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_4" transform="matrix(1 0 0 1 65 17.4)" fill="#CBCBCB" font-family="UniversNextPro-Light" font-size="20px">-</text>
+<text id="toro_text_5" transform="matrix(1 0 0 1 185 17.4)" fill="#CBCBCB" font-family="UniversNextPro-Light" font-size="20px">-</text>
+<text id="toro_text_6" transform="matrix(1 0 0 1 305 17.4)" fill="#000000" font-family="UniversNextPro-Light" font-size="20px">-</text>
+<text id="toro_text_7" transform="matrix(1 0 0 1 425 17.4)" fill="#000000" font-family="UniversNextPro-Light" font-size="20px">-</text>
+<text id="toro_text_8" transform="matrix(1 0 0 1 5 33)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_9" transform="matrix(1 0 0 1 125 33)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_10" transform="matrix(1 0 0 1 245 33)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_11" transform="matrix(1 0 0 1 365 33)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10px">-</text>
+<text id="toro_text_12" transform="matrix(1 0 0 1 65 33)" fill="#707070" font-family="UniversNextPro-Light" font-size="13px">-</text>
+<text id="toro_text_13" transform="matrix(1 0 0 1 185 33)" fill="#707070" font-family="UniversNextPro-Light" font-size="13px">-</text>
+<text id="toro_text_14" transform="matrix(1 0 0 1 305 33)" fill="#707070" font-family="UniversNextPro-Light" font-size="13px">-</text>
+<text id="toro_text_15" transform="matrix(1 0 0 1 425 33)" fill="#707070" font-family="UniversNextPro-Light" font-size="13px">-</text>
+<path d="M360,202 C360,206.418 306.276,210 240,210 C173.724,210 120,206.418 120,202 C120,197.582 173.724,194 240,194 C306.276,194 360,197.582 360,202 Z" fill="none" stroke="#2A2A2A" stroke-width="1.5"/>
+<path d="M270,202 C300,210 360,204 400,194" fill="none" stroke="#707070" stroke-width="1.5"/>
+<path d="M400,194 L408,194" fill="none" stroke="#5A5A5A" stroke-width="1.5"/>
+<path d="M276,196 C276,199.866 259.883,203 240,203 C220.117,203 204,199.866 204,196 C204,192.134 220.117,189 240,189 C259.883,189 276,192.134 276,196 Z" fill="#1A1A1A" stroke="#9A9A9A" stroke-width="1.5"/>
+<path d="M228,192 L252,192 L252,178 L228,178 Z" fill="#1A1A1A" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_10" transform="matrix(1 0 0 1 640 320)" d="M30,0 C30,2.761 16.569,5 0,5 C-16.569,5 -30,2.761 -30,0 C-30,-2.761 -16.569,-5 0,-5 C16.569,-5 30,-2.761 30,0 Z" fill="#141414" stroke="#141414" stroke-width="0.5"/>
+<path id="toro_node_11" transform="matrix(1 0 0 1 640 320)" d="M-7,0 L7,0 L7,-16 L-7,-16 Z" fill="#1A1A1A" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_46" transform="matrix(1 0 0 1 640 320)" d="M46,-8 C46,4.151 25.406,14 0,14 C-25.406,14 -46,4.151 -46,-8 C-46,-20.151 -25.406,-30 0,-30 C25.406,-30 46,-20.151 46,-8 Z M-30,-26 L-44,-44 L-32,-40 Z M30,-26 L44,-44 L32,-40 Z" fill="#161616" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_31" transform="matrix(1 0 0 1 640 320)" d="M-10,0 L10,0 L8,-28 L-8,-28 Z M-5,-28 L5,-28 L5,-33 L-5,-33 Z M11,-44 C11,-37.372 6.075,-32 0,-32 C-6.075,-32 -11,-37.372 -11,-44 C-11,-50.628 -6.075,-56 0,-56 C6.075,-56 11,-50.628 11,-44 Z M-10,-25.25 L-22,-13.25 L-28,-5.25 L-28,-2.75 L-22,-10.75 L-10,-22.75 Z" fill="#101010" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_33" transform="matrix(1 0 0 1 640 320)" d="M0,0 L-18,6 L-30,20 L-40,24 L-36,30 L-22,28 L-12,14 L2,4 Z" fill="#101010" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_34" transform="matrix(1 0 0 1 640 320)" d="M0,0 L18,6 L30,20 L40,24 L36,30 L22,28 L12,14 L-2,4 Z" fill="#101010" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_35" transform="matrix(1 0 0 1 640 320)" d="M0,-1.5 L14,-3.5 L26,-9.5 L26,-6.5 L14,-0.5 L0,1.5 Z" fill="none" stroke="#9A9A9A" stroke-width="1"/>
+<path id="toro_node_12" transform="matrix(1 0 0 1 640 320)" d="M-34,-36 L34,-36 L36,-62 L22,-74 L-22,-74 L-36,-62 Z M-14,-40 L14,-40 L10,-30 L-10,-30 Z" fill="#161616" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_44" transform="matrix(1 0 0 1 640 320)" d="M-22,-74 L-12,-52 L12,-52 L22,-74 L21,-73 L11.5,-51 L-11.5,-51 L-21,-73 Z M-40,-48 L-26,-48 L-26,-47 L-40,-47 Z M26,-48 L40,-48 L40,-47 L26,-47 Z" fill="none" stroke="#5A5A5A" stroke-width="1"/>
+<path id="toro_node_45" transform="matrix(1 0 0 1 640 320)" d="M-5,-46.5 L-2,-46.5 L-2,-45.5 L-5,-45.5 Z M2,-46.5 L5,-46.5 L5,-45.5 L2,-45.5 Z M-3,-39.5 L3,-39.5 L3,-38.5 L-3,-38.5 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_32" transform="matrix(1 0 0 1 640 320)" d="M-30,0 L30,0 L30,-4 L12,-4 L11,-20 L-11,-20 L-12,-4 L-30,-4 Z" fill="#1A1A1A" stroke="#F0F0F0" stroke-width="1.5"/>
+<path id="toro_node_13" transform="matrix(1 0 0 1 640 320)" d="M0,-4 L-10,-7 L-22,-12 L-32,-20 L-38,-30 L-40,-38 L-40,-30 L-38,-22 L-32,-12 L-22,-4 L-10,1 L0,4 Z" fill="#1E1E1E" stroke="#F0F0F0" stroke-width="1.5"/>
+<path id="toro_node_14" transform="matrix(1 0 0 1 640 320)" d="M0,-4 L10,-7 L22,-12 L32,-20 L38,-30 L40,-38 L40,-30 L38,-22 L32,-12 L22,-4 L10,1 L0,4 Z" fill="#1E1E1E" stroke="#F0F0F0" stroke-width="1.5"/>
+<path id="toro_node_15" transform="matrix(1 0 0 1 640 320)" d="M-10,-2.5 L10,-2.5 L10,2.5 L-10,2.5 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_16" transform="matrix(1 0 0 1 640 320)" d="M-10,-2.5 L10,-2.5 L10,2.5 L-10,2.5 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_17" transform="matrix(1 0 0 1 640 320)" d="M9,9 C9,13.418 4.971,17 0,17 C-4.971,17 -9,13.418 -9,9 C-9,4.582 -4.971,1 0,1 C4.971,1 9,4.582 9,9 Z" fill="none" stroke="#F0F0F0" stroke-width="2"/>
+<path id="toro_node_18" transform="matrix(1 0 0 1 640 320)" d="M-16,-6 L16,-6 L16,6 L-16,6 Z" fill="none" stroke="#CBCBCB" stroke-width="1"/>
+<path id="toro_node_19" transform="matrix(1 0 0 1 640 320)" d="M-16,-6 L16,-6 L16,6 L-16,6 Z" fill="none" stroke="#CBCBCB" stroke-width="1"/>
+<path id="toro_node_20" transform="matrix(1 0 0 1 640 320)" d="M-5,0 C-5,-7 5,-7 5,0 L4,0.4 C4,-5 -4,-5 -4,0.4 Z" fill="none" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_21" transform="matrix(1 0 0 1 640 320)" d="M-5,0 C-5,-7 5,-7 5,0 L4,0.4 C4,-5 -4,-5 -4,0.4 Z" fill="none" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_22" transform="matrix(1 0 0 1 640 320)" d="M-5,0 C-5,-7 5,-7 5,0 L4,0.4 C4,-5 -4,-5 -4,0.4 Z" fill="none" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_23" transform="matrix(1 0 0 1 640 320)" d="M-5,0 C-5,-7 5,-7 5,0 L4,0.4 C4,-5 -4,-5 -4,0.4 Z" fill="none" stroke="#9A9A9A" stroke-width="1.5"/>
+<path id="toro_node_24" transform="matrix(1 0 0 1 640 320)" d="M-3,-0.3 L3,-0.3 L3,0.3 L-3,0.3 Z M-0.3,-3 L0.3,-3 L0.3,3 L-0.3,3 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_25" transform="matrix(1 0 0 1 640 320)" d="M-3,-0.3 L3,-0.3 L3,0.3 L-3,0.3 Z M-0.3,-3 L0.3,-3 L0.3,3 L-0.3,3 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_26" transform="matrix(1 0 0 1 640 320)" d="M-3,-0.3 L3,-0.3 L3,0.3 L-3,0.3 Z M-0.3,-3 L0.3,-3 L0.3,3 L-0.3,3 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_27" transform="matrix(1 0 0 1 640 320)" d="M-3,-0.3 L3,-0.3 L3,0.3 L-3,0.3 Z M-0.3,-3 L0.3,-3 L0.3,3 L-0.3,3 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_28" transform="matrix(1 0 0 1 640 320)" d="M-3,-0.3 L3,-0.3 L3,0.3 L-3,0.3 Z M-0.3,-3 L0.3,-3 L0.3,3 L-0.3,3 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_29" transform="matrix(1 0 0 1 640 320)" d="M-3,-0.3 L3,-0.3 L3,0.3 L-3,0.3 Z M-0.3,-3 L0.3,-3 L0.3,3 L-0.3,3 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_30" transform="matrix(1 0 0 1 640 320)" d="M3,0 C3,1.657 1.657,3 0,3 C-1.657,3 -3,1.657 -3,0 C-3,-1.657 -1.657,-3 0,-3 C1.657,-3 3,-1.657 3,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_0" transform="matrix(1 0 0 1 640 320)" d="M20,0 L19.904,1.96 L19.616,3.902 L19.139,5.806 L18.478,7.654 L17.638,9.428 L16.629,11.111 L15.46,12.688 L14.142,14.142 L12.688,15.46 L11.111,16.629 L9.428,17.638 L7.654,18.478 L5.806,19.139 L3.902,19.616 L1.96,19.904 L0,20 L-1.96,19.904 L-3.902,19.616 L-5.806,19.139 L-7.654,18.478 L-9.428,17.638 L-11.111,16.629 L-12.688,15.46 L-14.142,14.142 L-15.46,12.688 L-16.629,11.111 L-17.638,9.428 L-18.478,7.654 L-19.139,5.806 L-19.616,3.902 L-19.904,1.96 L-20,0 L-19.904,-1.96 L-19.616,-3.902 L-19.139,-5.806 L-18.478,-7.654 L-17.638,-9.428 L-16.629,-11.111 L-15.46,-12.688 L-14.142,-14.142 L-12.688,-15.46 L-11.111,-16.629 L-9.428,-17.638 L-7.654,-18.478 L-5.806,-19.139 L-3.902,-19.616 L-1.96,-19.904 L0,-20 L1.96,-19.904 L3.902,-19.616 L5.806,-19.139 L7.654,-18.478 L9.428,-17.638 L11.111,-16.629 L12.688,-15.46 L14.142,-14.142 L15.46,-12.688 L16.629,-11.111 L17.638,-9.428 L18.478,-7.654 L19.139,-5.806 L19.616,-3.902 L19.904,-1.96 Z" fill="none" stroke="#F0F0F0" stroke-width="2"/>
+<path id="toro_node_1" transform="matrix(1 0 0 1 640 320)" d="M20,0 L19.904,1.96 L19.616,3.902 L19.139,5.806 L18.478,7.654 L17.638,9.428 L16.629,11.111 L15.46,12.688 L14.142,14.142 L12.688,15.46 L11.111,16.629 L9.428,17.638 L7.654,18.478 L5.806,19.139 L3.902,19.616 L1.96,19.904 L0,20 L-1.96,19.904 L-3.902,19.616 L-5.806,19.139 L-7.654,18.478 L-9.428,17.638 L-11.111,16.629 L-12.688,15.46 L-14.142,14.142 L-15.46,12.688 L-16.629,11.111 L-17.638,9.428 L-18.478,7.654 L-19.139,5.806 L-19.616,3.902 L-19.904,1.96 L-20,0 L-19.904,-1.96 L-19.616,-3.902 L-19.139,-5.806 L-18.478,-7.654 L-17.638,-9.428 L-16.629,-11.111 L-15.46,-12.688 L-14.142,-14.142 L-12.688,-15.46 L-11.111,-16.629 L-9.428,-17.638 L-7.654,-18.478 L-5.806,-19.139 L-3.902,-19.616 L-1.96,-19.904 L0,-20 L1.96,-19.904 L3.902,-19.616 L5.806,-19.139 L7.654,-18.478 L9.428,-17.638 L11.111,-16.629 L12.688,-15.46 L14.142,-14.142 L15.46,-12.688 L16.629,-11.111 L17.638,-9.428 L18.478,-7.654 L19.139,-5.806 L19.616,-3.902 L19.904,-1.96 Z" fill="none" stroke="#5A5A5A" stroke-width="2"/>
+<path id="toro_node_36" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_37" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_38" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_39" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_40" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_41" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_42" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_43" transform="matrix(1 0 0 1 640 320)" d="M0,-0.6 L18,-0.6 L18,0.6 L0,0.6 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path id="toro_node_47" transform="matrix(1 0 0 1 640 320)" d="M-1,-1 L1,-1 L1,1 L-1,1 Z" fill="none" stroke="#5A5A5A" stroke-width="1"/>
+<circle id="toro_palette_0" cx="640" cy="0" r="1" fill="#101010" stroke="#2A2A2A" stroke-width="1.5"/>
+<circle id="toro_palette_1" cx="640" cy="0" r="1" fill="#101010" stroke="#3C3C3C" stroke-width="1.5"/>
+<circle id="toro_palette_2" cx="640" cy="0" r="1" fill="#101010" stroke="#5A5A5A" stroke-width="1.5"/>
+<circle id="toro_palette_3" cx="640" cy="0" r="1" fill="#101010" stroke="#707070" stroke-width="1.5"/>
+<circle id="toro_palette_4" cx="640" cy="0" r="1" fill="#101010" stroke="#8C8C8C" stroke-width="1.5"/>
+<circle id="toro_palette_5" cx="640" cy="0" r="1" fill="#101010" stroke="#A8A8A8" stroke-width="1.5"/>
+<circle id="toro_palette_6" cx="640" cy="0" r="1" fill="#101010" stroke="#CBCBCB" stroke-width="1.5"/>
+<circle id="toro_palette_7" cx="640" cy="0" r="1" fill="#101010" stroke="#F0F0F0" stroke-width="1.5"/>
+<circle id="toro_palette_8" cx="640" cy="0" r="1" fill="#1A1A1A" stroke="#1A1A1A" stroke-width="1.5"/>
+<circle id="toro_palette_9" cx="640" cy="0" r="1" fill="#2A2A2A" stroke="#2A2A2A" stroke-width="1.5"/>
+<circle id="toro_palette_10" cx="640" cy="0" r="1" fill="#4B4B4B" stroke="#4B4B4B" stroke-width="1.5"/>
+<circle id="toro_palette_11" cx="640" cy="0" r="1" fill="#707070" stroke="#707070" stroke-width="1.5"/>
+<circle id="toro_palette_12" cx="640" cy="0" r="1" fill="#9A9A9A" stroke="#9A9A9A" stroke-width="1.5"/>
+<circle id="toro_palette_13" cx="640" cy="0" r="1" fill="#B8B8B8" stroke="#B8B8B8" stroke-width="1.5"/>
+<circle id="toro_palette_14" cx="640" cy="0" r="1" fill="#D6D6D6" stroke="#D6D6D6" stroke-width="1.5"/>
+<circle id="toro_palette_15" cx="640" cy="0" r="1" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.5"/>
+</g>
