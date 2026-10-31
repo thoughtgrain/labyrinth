@@ -2,46 +2,44 @@
 // toro for the OP-XY: node indices, written by gen_panel.py. Edit the generator, not this file.
 namespace toro {
 enum {
-    N_LASSO = 0, N_LASSO_COUNT = 1,
-    N_ROPE = 1, N_ROPE_COUNT = 1,
+    N_PATH0 = 0, N_PATH0_COUNT = 1,
+    N_PATH1 = 1, N_PATH1_COUNT = 1,
     N_HDR = 2, N_HDR_COUNT = 8,
-    N_SHADOW = 10, N_SHADOW_COUNT = 1,
-    N_ROD = 11, N_ROD_COUNT = 3,
-    N_BODY = 14, N_BODY_COUNT = 20,
-    N_THIGH_L = 34, N_THIGH_L_COUNT = 1,
-    N_THIGH_R = 35, N_THIGH_R_COUNT = 1,
-    N_TORSO = 36, N_TORSO_COUNT = 14,
-    N_HEAD = 50, N_HEAD_COUNT = 9,
-    N_EYES = 59, N_EYES_COUNT = 4,
-    N_SMILE = 63, N_SMILE_COUNT = 1,
-    N_OMOUTH = 64, N_OMOUTH_COUNT = 1,
-    N_BRIM = 65, N_BRIM_COUNT = 8,
-    N_CROWN = 73, N_CROWN_COUNT = 7,
-    N_UPPER = 80, N_UPPER_COUNT = 1,
-    N_FORE = 81, N_FORE_COUNT = 2,
-    N_PLATE = 83, N_PLATE_COUNT = 23,
-    N_EYE_L = 106, N_EYE_L_COUNT = 1,
-    N_EYE_R = 107, N_EYE_R_COUNT = 1,
-    N_HILITE_L = 108, N_HILITE_L_COUNT = 1,
-    N_HILITE_R = 109, N_HILITE_R_COUNT = 1,
-    N_SHIN_L = 110, N_SHIN_L_COUNT = 1,
-    N_SHIN_R = 111, N_SHIN_R_COUNT = 1,
-    N_BOOT_L = 112, N_BOOT_L_COUNT = 5,
-    N_BOOT_R = 117, N_BOOT_R_COUNT = 5,
-    N_SPUR_L = 122, N_SPUR_L_COUNT = 5,
-    N_SPUR_R = 127, N_SPUR_R_COUNT = 5,
-    N_HORN_L = 132, N_HORN_L_COUNT = 1,
-    N_HORN_R = 133, N_HORN_R_COUNT = 1,
-    N_TIP_L = 134, N_TIP_L_COUNT = 1,
-    N_TIP_R = 135, N_TIP_R_COUNT = 1,
-    N_COLLAR_L = 136, N_COLLAR_L_COUNT = 1,
-    N_COLLAR_R = 137, N_COLLAR_R_COUNT = 1,
-    N_RING = 138, N_RING_COUNT = 2,
-    N_STEAM = 140, N_STEAM_COUNT = 4,
-    N_SPARK = 144, N_SPARK_COUNT = 6,
-    N_PULSE = 150, N_PULSE_COUNT = 1,
-    N_TEAR = 151, N_TEAR_COUNT = 8,
-    N_KNOT = 159, N_KNOT_COUNT = 1,
-    N_TOTAL = 160
+    N_ALD = 10, N_ALD_COUNT = 3,
+    N_S_G1 = 13, N_S_G1_COUNT = 1,
+    N_S_G2 = 14, N_S_G2_COUNT = 1,
+    N_S_G3 = 15, N_S_G3_COUNT = 1,
+    N_S_G4 = 16, N_S_G4_COUNT = 1,
+    N_S_BETA = 17, N_S_BETA_COUNT = 1,
+    N_S_ZETA = 18, N_S_ZETA_COUNT = 1,
+    N_S_BACK = 19, N_S_BACK_COUNT = 1,
+    N_S_TAIL = 20, N_S_TAIL_COUNT = 1,
+    N_JOIN = 21, N_JOIN_COUNT = 9,
+    N_PLE = 30, N_PLE_COUNT = 7,
+    N_PLE_RING = 37, N_PLE_RING_COUNT = 10,
+    N_COMET0 = 47, N_COMET0_COUNT = 2,
+    N_COMET1 = 49, N_COMET1_COUNT = 2,
+    N_COMET2 = 51, N_COMET2_COUNT = 2,
+    N_COMET3 = 53, N_COMET3_COUNT = 2,
+    N_TWINKLE = 55, N_TWINKLE_COUNT = 12,
+    N_BAND = 67, N_BAND_COUNT = 1,
+    N_TOTAL = 68
 };
+}
+
+// chart geometry (pixels relative to the chart centre; twinkle positions absolute)
+namespace toro {
+const int CHART_CX = 240, CHART_CY = 134;
+enum { ST_ALD, ST_G1, ST_G2, ST_G3, ST_G4, ST_BETA, ST_ZETA, ST_BACK, ST_TAIL, ST_N };
+const int STAR_X[ST_N] = { 18, -6, -26, -4, -28, 110, 96, -70, -150 };
+const int STAR_Y[ST_N] = { 2, -14, -24, 16, 28, -56, 44, -6, 22 };
+const int STAR_NODE[ST_N] = { N_ALD + 1, N_S_G1, N_S_G2, N_S_G3, N_S_G4, N_S_BETA, N_S_ZETA, N_S_BACK, N_S_TAIL };
+const int JOIN_N = 9;
+const int JOIN_A[JOIN_N] = { ST_ALD, ST_G1, ST_ALD, ST_G3, ST_G1, ST_G3, ST_G2, ST_G4, ST_BACK };
+const int JOIN_B[JOIN_N] = { ST_G1, ST_G2, ST_G3, ST_G4, ST_BETA, ST_ZETA, ST_BACK, ST_BACK, ST_TAIL };
+const int PLE_X = -120, PLE_Y = -28;
+const int PLE_DX[7] = { -8, -2, 5, 9, 3, -5, 0 };
+const int PLE_DY[7] = { -4, -7, -5, 1, 5, 6, 0 };
+const int TW_X[12] = { 440, 32, 192, 337, 23, 150, 142, 466, 378, 444, 359, 452 };
+const int TW_Y[12] = { 125, 78, 189, 47, 70, 84, 75, 157, 201, 164, 104, 93 };
 }

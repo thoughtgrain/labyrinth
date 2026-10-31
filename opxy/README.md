@@ -2,13 +2,13 @@
 
 This folder is my port of two of the three labyrinth plugins to the teenage engineering OP-XY, built on the [Open-XY SDK](https://github.com/etcetc000/open-xy). The OP-1 versions in the folders above are untouched; this is a separate tree with its own licence (MIT, like the SDK and most XY machines).
 
-- **toro**: the two-oscillator wavefolder synth, with APHX.
+- **toro**: the two-oscillator wavefolder synth, with APHX. On the XY its screen is a star chart: Taurus, with the controls on the stars and comets.
 - **theseus**: the DFAM-style percussion voice.
 - **meikyu**: the shift register as a note player (phrase mode), against the SDK's unmerged `firmware/native-players` branch. See [What about meikyu?](#what-about-meikyu).
 
-![toro on the XY: the rider at rest](docs/toro_rest.png)
+![toro on the XY: Taurus at rest](docs/toro_rest.png)
 
-![toro on the XY: thrown at full Fold, the lasso out](docs/toro_fold.png)
+![toro on the XY: a note at high settings, Aldebaran flaring, the sky turned, a comet](docs/toro_fold.png)
 
 ![theseus on the XY: front for the kick](docs/theseus_kick.png)
 
@@ -45,26 +45,26 @@ On the XY's style guide: it says engine pages should not hold LFOs, because the 
 
 The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored SVG and lets code move the parts, with a budget of 256 parts, 4 reshapable outlines and 16 greys. So each screen is now a `gen_panel.py` that writes the artwork (`panel.svg.fragment`) with every moving part as a separate element around its own pivot, and a `display.cpp` that places them. The geometry is lifted straight from the OP-1 sources (the same rig units, the same Bezier outlines for the bull's plate and the helmet's five heads), and anything the OP-1 drew as a chain of lines (the horns, the cowboy's legs and lasso arm, the drummer's sticks) is a chain of nodes here, each placed at the end of the one before it and turned. The composition and the per-control shapes are the OP-1's:
 
-| toro | | theseus | |
+| toro (TAURUS) | | theseus (PHALANX) | |
 |---|---|---|---|
-| Spread | the horns grow and swing out; the hat brim with them | Decay | ripple rings from the struck head |
-| Fold | the rig rocks, the cowboy is thrown, his legs kick and his spurs spin, a pulse runs the hose | Punch | the kick beater winds back; a diamond on impact |
-| Cutoff | the eye slits open, his eyes with them; a note lights the slits | Cutoff | the eyes burn; rays on strong hits |
-| Res | the nose ring swings; the lasso rises and spins | FM | the crest grows, goes jagged and shakes |
-| Shape | the horn tips curl inward | Noise | sizzle specks |
-| Noise | sparks off the turntable | LFO | the head slides, with motion arcs |
-| Drive | steam from the vents | Rate | how fast it slides |
-| Aphx | glitch slices tear across the rig | Tune | moves which drum the sticks land on |
+| Spread | β and ζ Tauri, the horn tips, move out from the head | Decay | ripple rings from the struck head |
+| Fold | a note turns the sky about Aldebaran and it eases back, further with Fold | Punch | the kick beater winds back; a diamond on impact |
+| Cutoff | Aldebaran's magnitude, a point to a spiked blaze with a halo; a note flares it | Cutoff | the eyes burn; rays on strong hits |
+| Res | the Pleiades spin on a note and keep turning for Res; high Res tightens the cluster | FM | the crest grows, goes jagged and shakes |
+| Shape | bends the horns: the tip stars lift | Noise | sizzle specks |
+| Noise | twelve field stars twinkle while a note is held | LFO | the head slides, with motion arcs |
+| Drive | a faint wash under the Milky Way | Rate | how fast it slides |
+| Aphx | comets: each note may launch one, more often with Aphx; a rare comet crosses the idle sky on its own | Tune | moves which drum the sticks land on |
 
 Greyscale was less of a loss than I expected. The OP-1 screens already gave every control its own shape so colour was never the only cue; on the XY the shapes do all the work, with grey levels for lit against unlit.
 
-The look is a vintage western print, the kind of ink-on-cream label art with heavy contours, solid fills and hatching for shade, inverted for the XY's black screen: light-filled shapes (`#C9C9C9` paper, `#E2E2E2` cream) with ink (`#0A0A0A`) detail drawn on top of them, hatching as short ink strokes on the shaded sides, and starburst ornaments in the corners. That inversion is what makes it work on an OLED: a black line around a cream shape would vanish against the black background, so the contour is the fill's own edge and the ink goes inside.
+toro's screen left the bull behind. After trying the OP-1 drawing, a print style and a board of forty directions, the one that fit the XY was the oldest picture of a bull there is: the constellation. A star chart is points and hairlines on black, which is what the OLED draws best, and the controls land on real stars: Spread moves the horn tips β and ζ Tauri, Cutoff is Aldebaran's magnitude, Res spins the Pleiades at the shoulder, Fold turns the sky. Comets cross at random, more of them as Aphx rises, and one now and then on its own while the screen is idle. It is 68 nodes, and at rest only the comets move. theseus keeps its drummer in a print style (light fills, ink detail) until it gets the same treatment.
 
 Two XY-specific things worth knowing, plus the device's own drawing rules:
 
 - **The screen doesn't know the pitch.** The XY tells a display how many notes are held and counts note starts; it doesn't say which note. On the OP-1 the engine told the screen which drum zone a hit landed in. Here theseus's screen walks a stand-in pattern (kick-heavy, like a DRM pattern, seeded by the note count) to decide which drum the sticks hit. The sound follows the real pitch; the drawing follows a plausible one. The head still turns toward the drum it draws.
 - **Paint comes from a palette.** A part painted "fill and stroke" takes both from one palette entry, so the palette has two halves: entries 0..7 a near-black fill with an outline from dim to white, 8..15 solid greys. Most parts are painted `keep` now and carry their own greys in the artwork; the palette is for the few that change (the eye highlights, the lasso, the ripple rings).
-- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 125 nodes, theseus 119. `tools/panel_lint.py` checks all three panels against those rules; run it after regenerating artwork.
+- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 68 nodes, theseus 143. `tools/panel_lint.py` checks all three panels against those rules; run it after regenerating artwork.
 
 ## Build and try
 
