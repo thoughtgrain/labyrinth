@@ -1,71 +1,72 @@
 <g id="meikyu_panel">
 <rect x="0" y="20" width="480" height="200" fill="#000000"/>
-<path d="M128,44 L132.065,44.35 L136.075,45.016 L140.006,45.991 L143.834,47.268 L147.536,48.836 L151.09,50.683 L154.475,52.797 L157.671,55.161 L160.661,57.759 L163.426,60.574 L165.952,63.586 L168.224,66.775 L170.231,70.121 L171.962,73.6 L173.409,77.191 L174.564,80.871 L175.422,84.615 L175.982,88.4 L176.241,92.203 L176.2,96 L175.862,99.767 L175.231,103.481 L174.314,107.119 L173.118,110.66 L171.653,114.082 L169.931,117.365 L167.963,120.49 L165.765,123.438 L163.351,126.193 L160.739,128.739 L157.946,131.062 L154.991,133.15 L151.894,134.991 L148.675,136.576 L145.355,137.898 L141.955,138.95 L138.498,139.727 L135.005,140.229 L131.498,140.453 L128,140.4 L124.531,140.074 L121.114,139.478 L117.768,138.619 L114.514,137.504 L111.372,136.143 L108.36,134.545 L105.496,132.723 L102.796,130.691 L100.275,128.462 L97.948,126.052 L95.827,123.478 L93.924,120.758 L92.249,117.908 L90.809,114.95 L89.613,111.9 L88.664,108.781 L87.968,105.611 L87.525,102.411 L87.336,99.2 L87.4,96 L87.715,92.829 L88.275,89.708 L89.076,86.655 L90.11,83.689 L91.368,80.827 L92.841,78.086 L94.517,75.481 L96.384,73.029 L98.428,70.743 L100.635,68.635 L102.99,66.717 L105.476,64.998 L108.077,63.489 L110.776,62.195 L113.554,61.124 L116.393,60.278 L119.276,59.663 L122.184,59.278 L125.098,59.124 L128,59.2 L130.872,59.503 L133.697,60.028 L136.458,60.771 L139.137,61.724 L141.719,62.879 L144.189,64.227 L146.533,65.757 L148.737,67.458 L150.789,69.317 L152.678,71.322 L154.394,73.458 L155.927,75.71 L157.271,78.063 L158.419,80.501 L159.366,83.008 L160.108,85.568 L160.642,88.163 L160.969,90.778 L161.088,93.396 L161,96 L160.709,98.574 L160.218,101.103 L159.534,103.571 L158.662,105.963 L157.61,108.265 L156.387,110.464 L155.003,112.548 L153.468,114.503 L151.793,116.321 L149.991,117.991 L148.074,119.504 L146.057,120.853 L143.952,122.031 L141.774,123.033 L139.538,123.855 L137.258,124.494 L134.95,124.947 L132.627,125.216 L130.306,125.299 L128,125.2 L125.724,124.921 L123.492,124.465 L121.316,123.839 L119.212,123.048 L117.189,122.1 L115.261,121.002 L113.438,119.763 L111.73,118.394 L110.147,116.904 L108.696,115.304 L107.385,113.607 L106.221,111.823 L105.209,109.966 L104.353,108.049 L103.656,106.084 L103.12,104.084 L102.748,102.063 L102.537,100.033 L102.489,98.008 L102.6,96 L102.868,94.022 L103.288,92.086 L103.856,90.204 L104.566,88.386 L105.411,86.643 L106.384,84.986 L107.477,83.423 L108.681,81.964 L109.986,80.615 L111.383,79.383 L112.861,78.275 L114.41,77.296 L116.019,76.449 L117.676,75.739 L119.37,75.167 L121.09,74.734 L122.825,74.443 L124.562,74.291 L126.29,74.277 L128,74.4 L129.68,74.656 L131.32,75.041 L132.909,75.551 L134.44,76.18 L135.902,76.922 L137.289,77.77 L138.591,78.717 L139.803,79.755 L140.918,80.876 L141.93,82.07 L142.836,83.329 L143.63,84.644 L144.311,86.005 L144.876,87.401 L145.323,88.825 L145.652,90.265 L145.862,91.712 L145.956,93.156 L145.935,94.589 L145.8,96 L145.556,97.382 L145.206,98.725 L144.754,100.022 L144.206,101.266 L143.567,102.448 L142.844,103.563 L142.043,104.606 L141.171,105.569 L140.235,106.45 L139.243,107.243 L138.203,107.946 L137.122,108.556 L136.01,109.071 L134.873,109.49 L133.721,109.812 L132.561,110.038 L131.401,110.167 L130.25,110.203 L129.113,110.146 L128,110" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
-<path d="M167.906,83.034 L181.221,78.707" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
-<path d="M95.189,90.803 L81.361,88.613" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
-<path d="M152.182,83.679 L164.656,77.323" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
-<path d="M111.884,107.709 L100.558,115.938" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
-<path d="M134.111,84.007 L140.467,71.533" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
+<path d="M128,38 L131.026,38.267 L134.023,38.691 L136.985,39.27 L139.903,40.001 L142.769,40.882 L145.575,41.909 L148.315,43.078 L150.981,44.385 L153.565,45.825 L156.062,47.394 L158.466,49.087 L160.769,50.897 L162.967,52.82 L165.053,54.848 L167.023,56.977 L168.873,59.198 L170.597,61.505 L172.193,63.892 L173.655,66.351 L174.982,68.875 L176.17,71.456 L177.217,74.087 L178.122,76.76 L178.882,79.468 L179.496,82.202 L179.964,84.955 L180.286,87.719 L180.461,90.486 L180.49,93.249 L180.375,96 L180.116,98.731 L179.715,101.435 L179.175,104.105 L178.497,106.733 L177.685,109.313 L176.742,111.837 L175.671,114.299 L174.477,116.693 L173.163,119.012 L171.734,121.25 L170.196,123.402 L168.552,125.463 L166.809,127.427 L164.971,129.289 L163.046,131.046 L161.038,132.693 L158.955,134.226 L156.801,135.642 L154.585,136.938 L152.312,138.11 L149.99,139.158 L147.625,140.079 L145.224,140.87 L142.794,141.532 L140.342,142.063 L137.876,142.462 L135.401,142.73 L132.926,142.867 L130.457,142.873 L128,142.75" fill="none" stroke="#5A5A5A" stroke-width="1.4"/>
+<path d="M128,142.75 L125.563,142.499 L123.152,142.121 L120.775,141.619 L118.436,140.995 L116.143,140.251 L113.901,139.392 L111.717,138.42 L109.595,137.338 L107.542,136.151 L105.562,134.863 L103.661,133.478 L101.844,132.001 L100.113,130.437 L98.475,128.791 L96.931,127.069 L95.487,125.274 L94.146,123.415 L92.909,121.495 L91.78,119.522 L90.761,117.5 L89.854,115.436 L89.06,113.337 L88.381,111.208 L87.818,109.056 L87.371,106.887 L87.04,104.706 L86.826,102.521 L86.727,100.338 L86.744,98.162 L86.875,96 L87.119,93.857 L87.473,91.74 L87.937,89.655 L88.507,87.606 L89.182,85.599 L89.958,83.639 L90.832,81.732 L91.801,79.883 L92.861,78.096 L94.009,76.375 L95.239,74.725 L96.549,73.15 L97.934,71.653 L99.389,70.238 L100.909,68.909 L102.489,67.668 L104.125,66.517 L105.811,65.46 L107.542,64.497 L109.312,63.632 L111.117,62.866 L112.951,62.199 L114.808,61.633 L116.682,61.168 L118.569,60.804 L120.463,60.542 L122.359,60.381 L124.25,60.322 L126.132,60.361 L128,60.5" fill="none" stroke="#5A5A5A" stroke-width="1.4"/>
+<path d="M128,60.5 L129.848,60.736 L131.672,61.067 L133.465,61.493 L135.225,62.009 L136.945,62.615 L138.622,63.307 L140.252,64.083 L141.829,64.939 L143.351,65.873 L144.812,66.88 L146.211,67.957 L147.544,69.1 L148.807,70.306 L149.998,71.569 L151.114,72.886 L152.152,74.253 L153.112,75.665 L153.99,77.117 L154.785,78.606 L155.496,80.125 L156.122,81.671 L156.662,83.239 L157.116,84.823 L157.483,86.42 L157.763,88.025 L157.956,89.633 L158.063,91.239 L158.084,92.838 L158.021,94.427 L157.875,96 L157.647,97.554 L157.338,99.084 L156.952,100.585 L156.489,102.055 L155.951,103.49 L155.343,104.884 L154.665,106.236 L153.922,107.541 L153.115,108.797 L152.249,110 L151.326,111.148 L150.349,112.238 L149.323,113.267 L148.251,114.234 L147.136,115.136 L145.983,115.972 L144.795,116.74 L143.576,117.439 L142.331,118.068 L141.062,118.625 L139.775,119.11 L138.473,119.524 L137.161,119.865 L135.841,120.133 L134.519,120.329 L133.198,120.454 L131.882,120.507 L130.574,120.49 L129.279,120.404 L128,120.25" fill="none" stroke="#5A5A5A" stroke-width="1.4"/>
+<path d="M128,120.25 L126.741,120.03 L125.504,119.744 L124.294,119.396 L123.114,118.986 L121.966,118.518 L120.854,117.993 L119.78,117.414 L118.747,116.783 L117.757,116.103 L116.813,115.377 L115.916,114.608 L115.069,113.798 L114.273,112.951 L113.53,112.071 L112.841,111.159 L112.208,110.219 L111.631,109.255 L111.112,108.27 L110.65,107.267 L110.246,106.25 L109.901,105.222 L109.615,104.186 L109.387,103.145 L109.217,102.103 L109.104,101.063 L109.048,100.028 L109.049,99.002 L109.104,97.986 L109.213,96.985 L109.375,96 L109.588,95.035 L109.85,94.092 L110.16,93.174 L110.516,92.284 L110.915,91.422 L111.357,90.592 L111.837,89.796 L112.356,89.035 L112.909,88.311 L113.494,87.625 L114.11,86.979 L114.752,86.375 L115.42,85.813 L116.11,85.294 L116.819,84.819 L117.545,84.388 L118.285,84.003 L119.036,83.662 L119.796,83.368 L120.562,83.118 L121.332,82.913 L122.102,82.754 L122.871,82.638 L123.635,82.566 L124.393,82.537 L125.141,82.55 L125.878,82.604 L126.602,82.698 L127.31,82.831 L128,83" fill="none" stroke="#5A5A5A" stroke-width="1.4"/>
+<path d="M156.206,127.059 L166.475,137.994 L167.495,137.036 L157.227,126.101 Z" fill="#5A5A5A" stroke="#5A5A5A" stroke-width="0.5"/>
+<path d="M107.495,73.141 L97.226,62.207 L96.206,63.165 L106.474,74.1 Z" fill="#5A5A5A" stroke="#5A5A5A" stroke-width="0.5"/>
+<path d="M140.804,110.658 L151.072,121.592 L152.093,120.634 L141.825,109.699 Z" fill="#5A5A5A" stroke="#5A5A5A" stroke-width="0.5"/>
 <circle cx="128" cy="96" r="5" fill="none" stroke="#9A9A9A" stroke-width="1.2"/>
 <circle cx="128" cy="96" r="1.6" fill="#9A9A9A" stroke="#9A9A9A" stroke-width="0.5"/>
-<path d="M143.834,41.768 L149.334,47.268 L143.834,52.768 L138.334,47.268 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_0" transform="matrix(1 0 0 1 143.834 47.268)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M174.564,75.371 L180.064,80.871 L174.564,86.371 L169.064,80.871 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_1" transform="matrix(1 0 0 1 174.564 80.871)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M165.765,117.938 L171.265,123.438 L165.765,128.938 L160.265,123.438 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_2" transform="matrix(1 0 0 1 165.765 123.438)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M128,134.9 L133.5,140.4 L128,145.9 L122.5,140.4 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_3" transform="matrix(1 0 0 1 128 140.4)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M93.924,115.258 L99.424,120.758 L93.924,126.258 L88.424,120.758 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_4" transform="matrix(1 0 0 1 93.924 120.758)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M90.11,78.189 L95.61,83.689 L90.11,89.189 L84.61,83.689 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_5" transform="matrix(1 0 0 1 90.11 83.689)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M116.393,54.778 L121.893,60.278 L116.393,65.778 L110.893,60.278 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_6" transform="matrix(1 0 0 1 116.393 60.278)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M148.737,61.958 L154.237,67.458 L148.737,72.958 L143.237,67.458 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_7" transform="matrix(1 0 0 1 148.737 67.458)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M161,90.5 L166.5,96 L161,101.5 L155.5,96 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_8" transform="matrix(1 0 0 1 161 96)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M146.057,115.353 L151.557,120.853 L146.057,126.353 L140.557,120.853 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_9" transform="matrix(1 0 0 1 146.057 120.853)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M119.212,117.548 L124.712,123.048 L119.212,128.548 L113.712,123.048 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_10" transform="matrix(1 0 0 1 119.212 123.048)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M103.12,98.584 L108.62,104.084 L103.12,109.584 L97.62,104.084 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_11" transform="matrix(1 0 0 1 103.12 104.084)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M108.681,76.464 L114.181,81.964 L108.681,87.464 L103.181,81.964 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_12" transform="matrix(1 0 0 1 108.681 81.964)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M128,68.9 L133.5,74.4 L128,79.9 L122.5,74.4 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_13" transform="matrix(1 0 0 1 128 74.4)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M143.63,79.144 L149.13,84.644 L143.63,90.144 L138.13,84.644 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_14" transform="matrix(1 0 0 1 143.63 84.644)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<path d="M144.206,95.766 L149.706,101.266 L144.206,106.766 L138.706,101.266 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<path id="meikyu_dot_15" transform="matrix(1 0 0 1 144.206 101.266)" d="M0,-3.2 L3.2,0 L0,3.2 L-3.2,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
-<text transform="matrix(1 0 0 1 151.834 43.268)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10" text-anchor="start">A</text>
-<text transform="matrix(1 0 0 1 147 99)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10" text-anchor="start">B</text>
+<path d="M138.742,33.19 L145.242,39.69 L138.742,46.19 L132.242,39.69 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_0" transform="matrix(1 0 0 1 138.742 39.69)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M172.077,57.211 L178.577,63.711 L172.077,70.211 L165.577,63.711 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_1" transform="matrix(1 0 0 1 172.077 63.711)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M179.593,95.606 L186.093,102.106 L179.593,108.606 L173.093,102.106 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_2" transform="matrix(1 0 0 1 179.593 102.106)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M159.849,127.088 L166.349,133.588 L159.849,140.088 L153.349,133.588 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_3" transform="matrix(1 0 0 1 159.849 133.588)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M125.806,136.03 L132.306,142.53 L125.806,149.03 L119.306,142.53 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_4" transform="matrix(1 0 0 1 125.806 142.53)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M96.598,120.171 L103.098,126.671 L96.598,133.171 L90.098,126.671 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_5" transform="matrix(1 0 0 1 96.598 126.671)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M86.802,90.471 L93.302,96.971 L86.802,103.471 L80.302,96.971 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_6" transform="matrix(1 0 0 1 86.802 96.971)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M99.203,63.911 L105.703,70.411 L99.203,76.911 L92.703,70.411 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_7" transform="matrix(1 0 0 1 99.203 70.411)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M124.627,53.822 L131.127,60.322 L124.627,66.822 L118.127,60.322 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_8" transform="matrix(1 0 0 1 124.627 60.322)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M148.216,63.226 L154.716,69.726 L148.216,76.226 L141.716,69.726 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_9" transform="matrix(1 0 0 1 148.216 69.726)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M158.052,84.498 L164.552,90.998 L158.052,97.498 L151.552,90.998 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_10" transform="matrix(1 0 0 1 158.052 90.998)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M151.158,104.843 L157.658,111.343 L151.158,117.843 L144.658,111.343 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_11" transform="matrix(1 0 0 1 151.158 111.343)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M133.858,113.9 L140.358,120.4 L133.858,126.9 L127.358,120.4 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_12" transform="matrix(1 0 0 1 133.858 120.4)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M116.974,109.008 L123.474,115.508 L116.974,122.008 L110.474,115.508 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_13" transform="matrix(1 0 0 1 116.974 115.508)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M109.196,95.447 L115.696,101.947 L109.196,108.447 L102.696,101.947 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_14" transform="matrix(1 0 0 1 109.196 101.947)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<path d="M112.614,82.186 L119.114,88.686 L112.614,95.186 L106.114,88.686 Z" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<path id="meikyu_dot_15" transform="matrix(1 0 0 1 112.614 88.686)" d="M0,-4 L4,0 L0,4 L-4,0 Z" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<text transform="matrix(1 0 0 1 150.2 36.694)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10" text-anchor="start">A</text>
+<text transform="matrix(1 0 0 1 114 63.5)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10" text-anchor="start">B</text>
 <path d="M220,96 L425,96" fill="none" stroke="#5A5A5A" stroke-width="1.2"/>
-<rect x="221" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_16" transform="matrix(1 0 0 1 228 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="220" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_16" transform="matrix(1 0 0 1 228 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 228 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">1</text>
-<rect x="248" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_17" transform="matrix(1 0 0 1 255 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="247" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_17" transform="matrix(1 0 0 1 255 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 255 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">2</text>
-<rect x="275" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_18" transform="matrix(1 0 0 1 282 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="274" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_18" transform="matrix(1 0 0 1 282 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 282 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">3</text>
-<rect x="302" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_19" transform="matrix(1 0 0 1 309 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="301" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_19" transform="matrix(1 0 0 1 309 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 309 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">4</text>
-<rect x="329" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_20" transform="matrix(1 0 0 1 336 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="328" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_20" transform="matrix(1 0 0 1 336 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 336 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">5</text>
-<rect x="356" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_21" transform="matrix(1 0 0 1 363 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="355" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_21" transform="matrix(1 0 0 1 363 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 363 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">6</text>
-<rect x="383" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_22" transform="matrix(1 0 0 1 390 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="382" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_22" transform="matrix(1 0 0 1 390 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 390 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">7</text>
-<rect x="410" y="89" width="14" height="14" fill="#000000" stroke="#9A9A9A" stroke-width="1"/>
-<circle id="meikyu_dot_23" transform="matrix(1 0 0 1 417 96)" cx="0" cy="0" r="4" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
+<rect x="409" y="88" width="16" height="16" fill="#000000" stroke="#9A9A9A" stroke-width="1.2"/>
+<circle id="meikyu_dot_23" transform="matrix(1 0 0 1 417 96)" cx="0" cy="0" r="4.5" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="0.5"/>
 <text transform="matrix(1 0 0 1 417 118)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="middle">8</text>
 <text transform="matrix(1 0 0 1 220 78)" fill="#9A9A9A" font-family="UniversNextPro-Light" font-size="11" text-anchor="start">phrase</text>
 <text transform="matrix(1 0 0 1 425 78)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="9" text-anchor="end">one tone per step</text>

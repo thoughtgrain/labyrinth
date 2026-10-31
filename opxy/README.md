@@ -14,6 +14,8 @@ This folder is my port of two of the three labyrinth plugins to the teenage engi
 
 ![theseus on the XY: the helmet turned to the hats, and to the cymbal](docs/theseus_hat.png)
 
+![the meikyu player page: the register on the labyrinth, the last phrase on the right](docs/meikyu_page.png)
+
 ## What changed in the port
 
 The OP-XY and the OP-1 are different instruments, and the SDKs reflect that. The sound code moved over almost as is; the screens had to be rebuilt.
@@ -56,10 +58,11 @@ The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored S
 
 Greyscale was less of a loss than I expected. The OP-1 screens already gave every control its own shape so colour was never the only cue; on the XY the shapes do all the work, with grey levels for lit against unlit.
 
-Two XY-specific things worth knowing:
+Two XY-specific things worth knowing, plus the device's own drawing rules:
 
 - **The screen doesn't know the pitch.** The XY tells a display how many notes are held and counts note starts; it doesn't say which note. On the OP-1 the engine told the screen which drum zone a hit landed in. Here theseus's screen walks a stand-in pattern (kick-heavy, like a DRM pattern, seeded by the note count) to decide which drum the sticks hit. The sound follows the real pitch; the drawing follows a plausible one. The head still turns toward the drum it draws.
-- **Paint comes from a palette.** A part painted "fill and stroke" takes both from one palette entry, so I built the palette in two halves: entries 0..7 are a near-black fill with an outline from dim to white (bodies), 8..15 are solid greys (lit parts).
+- **Paint comes from a palette.** A part painted "fill and stroke" takes both from one palette entry, so the palette has two halves: entries 0..7 a near-black fill with an outline from dim to white, 8..15 solid greys. Most parts are painted `keep` now and carry their own greys in the artwork; the palette is for the few that change (the eye highlights, the lasso, the ripple rings).
+- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 125 nodes, theseus 119. `tools/panel_lint.py` checks all three panels against those rules; run it after regenerating artwork.
 
 ## Build and try
 
@@ -74,7 +77,7 @@ python tools/serve_harness.py --preview local/toro      # then open http://127.0
 
 `test` runs each machine's own sound checks (`tests/sound.cpp`: the same sweeps as the OP-1 tests, ported), builds the browser preview, checks every drawing frame against the SDK's bounds, and prints a host-timed CPU estimate. To build firmware you need the pinned Blackfin+ toolchain and your own `os.ldr`; the SDK's `docs/build.md` covers that.
 
-If you change the artwork, regenerate it: `python3 gen_panel.py > panel.svg.fragment` in the machine's folder.
+If you change the artwork, regenerate it: `python3 gen_panel.py` in toro's or theseus's folder (it writes `panel.svg.fragment`, `nodes.h` and the node count into `definition.json`), `python3 gen_panel.py > panel.svg.fragment` in meikyu's; then `python3 tools/panel_lint.py machines/*/panel.svg.fragment`.
 
 ## Status
 

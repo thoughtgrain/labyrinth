@@ -13,7 +13,7 @@ import math
 
 EDGE, SEC, DEC, LITE, DARK = '#CBCBCB', '#9A9A9A', '#5A5A5A', '#F0F0F0', '#2A2A2A'
 CX, CY = 128, 96                      # the labyrinth's centre
-R0, R1 = 14, 52                       # the spiral's inner and outer radius
+R0, R1 = 13, 58                       # the spiral's inner and outer radius
 
 
 def f(v):
@@ -21,9 +21,13 @@ def f(v):
     return '0' if s in ('-0', '') else s
 
 
+def poly(pts, close=True):
+    return 'M' + ' L'.join(f'{f(x)},{f(y)}' for x, y in pts) + (' Z' if close else '')
+
+
 def spiral_point(u):
-    """u 0..1 along the spiral, 2.5 turns from the outside in"""
-    a = -math.pi / 2 + u * 2.5 * 2 * math.pi
+    """u 0..1 along the spiral, two turns from the outside in"""
+    a = -math.pi / 2 + u * 2.0 * 2 * math.pi
     r = R1 - (R1 - R0) * u
     return CX + math.cos(a) * r, CY + math.sin(a) * r
 
@@ -43,23 +47,26 @@ def text(x, y, value, size=11, fill=SEC, anchor='start'):
 
 def main():
     o = ['<g id="meikyu_panel">', '<rect x="0" y="20" width="480" height="200" fill="#000000"/>']
-    # the labyrinth: the spiral path, walls dimmer than the steps
-    pts = [spiral_point(k / 200) for k in range(201)]
-    o.append('<path d="M' + ' L'.join(f'{f(x)},{f(y)}' for x, y in pts) + f'" fill="none" stroke="{DEC}" stroke-width="1.2"/>')
-    # a few wall stubs across the corridor, as on the OP-1
-    for u in (0.08, 0.31, 0.47, 0.66, 0.83):
+    # the labyrinth: the spiral corridor as two walls (the spiral and the same spiral a half-turn in), drawn in runs
+    # of at most 64 points each, the device's limit per path; a few wall stubs across the corridor, as on the OP-1
+    def runs(points, fill='none', stroke=DEC, w=1.2):
+        for k in range(0, len(points) - 1, 60):
+            seg = points[k:k + 61]
+            o.append('<path d="M' + ' L'.join(f'{f(x)},{f(y)}' for x, y in seg) + f'" fill="{fill}" stroke="{stroke}" stroke-width="{w}"/>')
+    runs([spiral_point(k / 240) for k in range(241)], stroke=DEC, w=1.4)
+    for u in (0.19, 0.44, 0.69):
         x, y = spiral_point(u)
         a = math.atan2(y - CY, x - CX)
-        dx, dy = math.cos(a) * 7, math.sin(a) * 7
-        o.append(f'<path d="M{f(x - dx)},{f(y - dy)} L{f(x + dx)},{f(y + dy)}" fill="none" stroke="{DEC}" stroke-width="1.2"/>')
+        dx, dy = math.cos(a) * 7.5, math.sin(a) * 7.5
+        o.append(f'<path d="{poly([(x - dx - math.sin(a) * 0.7, y - dy + math.cos(a) * 0.7), (x + dx - math.sin(a) * 0.7, y + dy + math.cos(a) * 0.7), (x + dx + math.sin(a) * 0.7, y + dy - math.cos(a) * 0.7), (x - dx + math.sin(a) * 0.7, y - dy - math.cos(a) * 0.7)])}" fill="{DEC}" stroke="{DEC}" stroke-width="0.5"/>')
     # the centre: the sequencer's eye
     o.append(f'<circle cx="{CX}" cy="{CY}" r="5" fill="none" stroke="{SEC}" stroke-width="1.2"/>')
     o.append(f'<circle cx="{CX}" cy="{CY}" r="1.6" fill="{SEC}" stroke="{SEC}" stroke-width="0.5"/>')
     # the sixteen steps as diamonds along the spiral: the A half (0..7) outside, the B half (8..15) inside; step 0 at the top
     for i in range(16):
-        x, y = spiral_point(0.02 + i * 0.96 / 16)
-        o.append(f'<path d="M{f(x)},{f(y - 5.5)} L{f(x + 5.5)},{f(y)} L{f(x)},{f(y + 5.5)} L{f(x - 5.5)},{f(y)} Z" fill="#000000" stroke="{SEC}" stroke-width="1"/>')
-        o.append(diamond(f'meikyu_dot_{i}', x, y, 3.2, LITE))
+        x, y = spiral_point(0.015 + i * 0.955 / 16)
+        o.append(f'<path d="M{f(x)},{f(y - 6.5)} L{f(x + 6.5)},{f(y)} L{f(x)},{f(y + 6.5)} L{f(x - 6.5)},{f(y)} Z" fill="#000000" stroke="{SEC}" stroke-width="1.2"/>')
+        o.append(diamond(f'meikyu_dot_{i}', x, y, 4, LITE))
     xa, ya = spiral_point(0.02); xb, yb = spiral_point(0.02 + 8 * 0.96 / 16)
     o.append(text(xa + 8, ya - 4, 'A', 10, DEC))
     o.append(text(xb - 14, yb + 3, 'B', 10, DEC))
@@ -69,8 +76,8 @@ def main():
     o.append(f'<path d="M{x0 - 8},{y0} L{x0 + 7 * gap + 8},{y0}" fill="none" stroke="{DEC}" stroke-width="1.2"/>')
     for k in range(8):
         x = x0 + k * gap
-        o.append(f'<rect x="{f(x - 7)}" y="{f(y0 - 7)}" width="14" height="14" fill="#000000" stroke="{SEC}" stroke-width="1"/>')
-        o.append(dot(f'meikyu_dot_{16 + k}', x, y0, 4, LITE))
+        o.append(f'<rect x="{f(x - 8)}" y="{f(y0 - 8)}" width="16" height="16" fill="#000000" stroke="{SEC}" stroke-width="1.2"/>')
+        o.append(dot(f'meikyu_dot_{16 + k}', x, y0, 4.5, LITE))
         o.append(text(x, y0 + 22, str(k + 1), 9, DEC, 'middle'))
     o.append(text(x0 - 8, y0 - 18, 'phrase', 11, SEC))
     o.append(text(x0 + 7 * gap + 8, y0 - 18, 'one tone per step', 9, DEC, 'end'))
