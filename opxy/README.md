@@ -58,6 +58,8 @@ The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored S
 
 Greyscale was less of a loss than I expected. The OP-1 screens already gave every control its own shape so colour was never the only cue; on the XY the shapes do all the work, with grey levels for lit against unlit.
 
+The look is a vintage western print, the kind of ink-on-cream label art with heavy contours, solid fills and hatching for shade, inverted for the XY's black screen: light-filled shapes (`#C9C9C9` paper, `#E2E2E2` cream) with ink (`#0A0A0A`) detail drawn on top of them, hatching as short ink strokes on the shaded sides, and starburst ornaments in the corners. That inversion is what makes it work on an OLED: a black line around a cream shape would vanish against the black background, so the contour is the fill's own edge and the ink goes inside.
+
 Two XY-specific things worth knowing, plus the device's own drawing rules:
 
 - **The screen doesn't know the pitch.** The XY tells a display how many notes are held and counts note starts; it doesn't say which note. On the OP-1 the engine told the screen which drum zone a hit landed in. Here theseus's screen walks a stand-in pattern (kick-heavy, like a DRM pattern, seeded by the note count) to decide which drum the sticks hit. The sound follows the real pitch; the drawing follows a plausible one. The head still turns toward the drum it draws.

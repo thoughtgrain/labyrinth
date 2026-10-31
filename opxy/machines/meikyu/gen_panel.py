@@ -11,7 +11,8 @@ along a track on the right (dots 16..23, lit when they sounded). Greyscale.
 Copyright (c) 2026 briannhinton. MIT."""
 import math
 
-EDGE, SEC, DEC, LITE, DARK = '#CBCBCB', '#9A9A9A', '#5A5A5A', '#F0F0F0', '#2A2A2A'
+EDGE, SEC, DEC, LITE, DARK = '#CBCBCB', '#A4A4A4', '#6E6E6E', '#F0F0F0', '#2A2A2A'
+INK, PAPER, CREAM = '#0A0A0A', '#C9C9C9', '#E2E2E2'
 CX, CY = 128, 96                      # the labyrinth's centre
 R0, R1 = 13, 58                       # the spiral's inner and outer radius
 
@@ -53,34 +54,47 @@ def main():
         for k in range(0, len(points) - 1, 60):
             seg = points[k:k + 61]
             o.append('<path d="M' + ' L'.join(f'{f(x)},{f(y)}' for x, y in seg) + f'" fill="{fill}" stroke="{stroke}" stroke-width="{w}"/>')
-    runs([spiral_point(k / 240) for k in range(241)], stroke=DEC, w=1.4)
+    # the corridor: a light band (the spiral wall drawn wide) with the walkway dark inside it, like a woodcut maze
+    runs([spiral_point(k / 240) for k in range(241)], stroke=PAPER, w=3.2)
+    runs([spiral_point(k / 240) for k in range(241)], stroke=INK, w=1.0)
+    # starburst ornaments either side of the title line, as on the print
+    def star(cx, cy, r, points=4, inner=0.3):
+        pts = []
+        for k in range(points * 2):
+            a = -math.pi / 2 + k * math.pi / points
+            rr = r if k % 2 == 0 else r * inner
+            pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr))
+        return poly(pts)
+    for sx, sy in ((158, 152), (322, 152)):
+        o.append(f'<path d="{star(sx, sy, 6, 4)}" fill="{CREAM}" stroke="{CREAM}" stroke-width="0.5"/>')
+        o.append(f'<path d="{star(sx + (10 if sx > 240 else -10), sy - 6, 3, 4)}" fill="{SEC}" stroke="{SEC}" stroke-width="0.5"/>')
     for u in (0.19, 0.44, 0.69):
         x, y = spiral_point(u)
         a = math.atan2(y - CY, x - CX)
         dx, dy = math.cos(a) * 7.5, math.sin(a) * 7.5
-        o.append(f'<path d="{poly([(x - dx - math.sin(a) * 0.7, y - dy + math.cos(a) * 0.7), (x + dx - math.sin(a) * 0.7, y + dy + math.cos(a) * 0.7), (x + dx + math.sin(a) * 0.7, y + dy - math.cos(a) * 0.7), (x - dx + math.sin(a) * 0.7, y - dy - math.cos(a) * 0.7)])}" fill="{DEC}" stroke="{DEC}" stroke-width="0.5"/>')
+        o.append(f'<path d="{poly([(x - dx - math.sin(a) * 1.4, y - dy + math.cos(a) * 1.4), (x + dx - math.sin(a) * 1.4, y + dy + math.cos(a) * 1.4), (x + dx + math.sin(a) * 1.4, y + dy - math.cos(a) * 1.4), (x - dx + math.sin(a) * 1.4, y - dy - math.cos(a) * 1.4)])}" fill="{PAPER}" stroke="{PAPER}" stroke-width="0.5"/>')
     # the centre: the sequencer's eye
-    o.append(f'<circle cx="{CX}" cy="{CY}" r="5" fill="none" stroke="{SEC}" stroke-width="1.2"/>')
-    o.append(f'<circle cx="{CX}" cy="{CY}" r="1.6" fill="{SEC}" stroke="{SEC}" stroke-width="0.5"/>')
+    o.append(f'<circle cx="{CX}" cy="{CY}" r="6" fill="{CREAM}" stroke="{INK}" stroke-width="1.2"/>')
+    o.append(f'<circle cx="{CX}" cy="{CY}" r="2" fill="{INK}" stroke="{INK}" stroke-width="0.5"/>')
     # the sixteen steps as diamonds along the spiral: the A half (0..7) outside, the B half (8..15) inside; step 0 at the top
     for i in range(16):
         x, y = spiral_point(0.015 + i * 0.955 / 16)
-        o.append(f'<path d="M{f(x)},{f(y - 6.5)} L{f(x + 6.5)},{f(y)} L{f(x)},{f(y + 6.5)} L{f(x - 6.5)},{f(y)} Z" fill="#000000" stroke="{SEC}" stroke-width="1.2"/>')
-        o.append(diamond(f'meikyu_dot_{i}', x, y, 4, LITE))
+        o.append(f'<path d="M{f(x)},{f(y - 7)} L{f(x + 7)},{f(y)} L{f(x)},{f(y + 7)} L{f(x - 7)},{f(y)} Z" fill="{INK}" stroke="{CREAM}" stroke-width="1.4"/>')
+        o.append(diamond(f'meikyu_dot_{i}', x, y, 4.2, CREAM))
     xa, ya = spiral_point(0.02); xb, yb = spiral_point(0.02 + 8 * 0.96 / 16)
-    o.append(text(xa + 8, ya - 4, 'A', 10, DEC))
-    o.append(text(xb - 14, yb + 3, 'B', 10, DEC))
+    o.append(text(xa + 9, ya - 5, 'A', 11, CREAM))
+    o.append(text(xb - 15, yb + 4, 'B', 11, CREAM))
 
     # the phrase track on the right: eight cells, the last phrase's tones light them in order
     x0, y0, gap = 228, 96, 27
-    o.append(f'<path d="M{x0 - 8},{y0} L{x0 + 7 * gap + 8},{y0}" fill="none" stroke="{DEC}" stroke-width="1.2"/>')
+    o.append(f'<path d="M{x0 - 8},{y0} L{x0 + 7 * gap + 8},{y0}" fill="none" stroke="{PAPER}" stroke-width="2.4"/>')
     for k in range(8):
         x = x0 + k * gap
-        o.append(f'<rect x="{f(x - 8)}" y="{f(y0 - 8)}" width="16" height="16" fill="#000000" stroke="{SEC}" stroke-width="1.2"/>')
-        o.append(dot(f'meikyu_dot_{16 + k}', x, y0, 4.5, LITE))
-        o.append(text(x, y0 + 22, str(k + 1), 9, DEC, 'middle'))
-    o.append(text(x0 - 8, y0 - 18, 'phrase', 11, SEC))
-    o.append(text(x0 + 7 * gap + 8, y0 - 18, 'one tone per step', 9, DEC, 'end'))
+        o.append(f'<rect x="{f(x - 8)}" y="{f(y0 - 8)}" width="16" height="16" fill="{INK}" stroke="{CREAM}" stroke-width="1.4"/>')
+        o.append(dot(f'meikyu_dot_{16 + k}', x, y0, 4.5, CREAM))
+        o.append(text(x, y0 + 22, str(k + 1), 9, SEC, 'middle'))
+    o.append(text(x0 - 8, y0 - 18, 'phrase', 11, CREAM))
+    o.append(text(x0 + 7 * gap + 8, y0 - 18, 'one tone per step', 9, SEC, 'end'))
     # the text line: the last root, which half the phrase began in, and the count
     o.append(f'<text id="meikyu_text" transform="matrix(1 0 0 1 240 157)" fill="#F2F2F2" font-family="UniversNextPro-Light" font-size="18" text-anchor="middle">meikyu</text>')
 
