@@ -7,7 +7,7 @@
  *   Spread  osc 2 ratio 1.0 .. 1.5           Shape  saw .. triangle (both oscillators)
  *   Fold    wavefolder gain 1x .. 8x         Noise  noise into the folder
  *   Cutoff  low-pass, squared response       Drive  output soft clip 1x .. 4x
- *   Res     low-pass resonance               Aphx   key-tracked drift that turns to chaos (below)
+ *   Res     low-pass resonance               Aphx   drift that turns to chaos; centre is off (below)
  *
  * APHX gives every key its own fixed, random-looking offsets to the two oscillators' tuning, the cutoff, fold,
  * shape and resonance. Low amounts keep it one sound with a little per-key detune and colour, the way an old poly
@@ -15,6 +15,15 @@
  * its own sample-and-hold rate. The offsets come from a hash of the note's position on the keyboard (from the
  * pitch, interpolated between neighbouring keys so a glide slides smoothly), so the same key always sounds the
  * same, and it needs no voice memory. On the OP-1, Drive and Aphx shared one knob; here each has its own slot.
+ *
+ * Aphx is split at its centre. Right of centre is that per-key drift, growing to the right. Left of centre is the
+ * same drift, growing to the left, but re-rolled on every note: each note takes its offsets from the track's note
+ * count instead of its key, so a sequencer step locked to the left side re-rolls just that step.
+ *
+ * The accent stands in for velocity, which the OP-XY doesn't give engines. Like theseus's hit LFO it steps once per
+ * note, locked to the sequence, on a four-note cycle: strong, weak, medium, weak. An accent deepens APHX on that
+ * note (by half at strong, a quarter at medium), so it is silent with Aphx at centre. The count lives in Shared,
+ * so every voice on the track steps the same cycle.
  *
  * Differences from the OP-1 build: 64-sample blocks, controls arrive as Q31 and the output is Q31 at half scale,
  * and the OP-XY gives engines no velocity, so velocity is gone (the XY's envelope and track volume stand in).
@@ -78,23 +87,42 @@ inline void initialize(Voice& v, Shared&, u32 owner)
 {
     v.ph1 = 0; v.ph2 = 0x40000000u; v.low = 0; v.band = 0; v.f_last = 0; v.dc_x = 0; v.dc_y = 0;
     v.rng = 0x9E3779B9u ^ (owner * 0x85EBCA6Bu);
+    v.roll = 0; v.accent = 0;
 }
 inline void start(Voice& v, Shared& s, u32 owner)
 {
+    static const i32 CYCLE[4] = { 16384, 0, 8192, 0 };                   // strong, weak, medium, weak
     initialize(v, s, owner);             // a quarter cycle apart: no cancelling at unison
+    v.accent = CYCLE[s.notes & 3u];
+    s.notes++;
+    v.roll = s.notes * 0x9E3779B1u;      // spread consecutive counts across the hash's input
 }
 inline void destroy(Voice&, Shared&, u32) {}
 
+/* Aphx's split: distance from the centre, 0..32767 either side, with a hair of dead zone so the centre is truly off */
+inline i32 aphx_amount(i32 w)
+{
+    const i32 d = w - 16384, m = (d < 0 ? -d : d) * 2 - 128;
+    return m <= 0 ? 0 : clampi((m * 32895) >> 15, 0, 32767);
+}
+
 inline void render(Voice& v, Shared&, u32, opxy::Output out, opxy::Parameters p, opxy::Pitch inc)
 {
-    const i32 drv = k15(p[6]), aphx = k15(p[7]);
+    const i32 drv = k15(p[6]), w7 = k15(p[7]);
+    const bool per_step = w7 < 16384;
+    i32 aphx = aphx_amount(w7);
+    aphx = clampi(aphx + ((aphx * v.accent) >> 15), 0, 32767);         // the accent deepens it
     i32 pf1 = k15(p[1]), pf3 = k15(p[3]), ps5 = k15(p[4]);
     i32 det1 = 0, det2 = 0, fmul = 4096, hold = 1;
     if (aphx) {
-        const i32 kq = key_q8(inc[0]), k = kq >> 8, kf = kq & 255;
-        i32 ra[6], rb[6], r[6];
-        key_rand(k, ra); key_rand(k + 1, rb);
-        for (int i = 0; i < 6; i++) r[i] = ra[i] + (((rb[i] - ra[i]) * kf) >> 8);
+        i32 r[6];
+        if (per_step) key_rand(static_cast<i32>(v.roll >> 1), r);       // this note's own roll
+        else {                                                           // this key's, blended with the next key's
+            const i32 kq = key_q8(inc[0]), k = kq >> 8, kf = kq & 255;
+            i32 ra[6], rb[6];
+            key_rand(k, ra); key_rand(k + 1, rb);
+            for (int i = 0; i < 6; i++) r[i] = ra[i] + (((rb[i] - ra[i]) * kf) >> 8);
+        }
         const i32 a = aphx, a2 = (a * a) >> 15, a3 = (a2 * a) >> 15;
         const i32 semis = ((a * 614) >> 15) + ((a3 * 11674) >> 15);        // Q12 semitones: 0.15 a + 2.85 a^3
         det1 = exp2q(((r[0] * semis) >> 15) / 12) - 4096;
