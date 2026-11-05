@@ -86,13 +86,13 @@
     {
       "id": "aphx",
       "label": "Aphx",
-      "default": 0.0,
+      "default": 0.5,
       "mapping": {
         "kind": "linear",
-        "minimum": 0,
+        "minimum": -1,
         "maximum": 1
       },
-      "display": "percent",
+      "display": "bipolar",
       "control": 3
     }
   ],
@@ -105,7 +105,7 @@
       "shape": 0,
       "noise": 0,
       "drive": 0,
-      "aphx": 0
+      "aphx": 0.5
     },
     "Bull": {
       "spread": 0.3,
@@ -115,7 +115,7 @@
       "shape": 0.2,
       "noise": 0.1,
       "drive": 0.5,
-      "aphx": 0
+      "aphx": 0.5
     },
     "Drift": {
       "spread": 0.06,
@@ -125,7 +125,7 @@
       "shape": 0,
       "noise": 0,
       "drive": 0.2,
-      "aphx": 0.3
+      "aphx": 0.65
     },
     "Labyrinth": {
       "spread": 0.5,
@@ -136,13 +136,23 @@
       "noise": 0.3,
       "drive": 0.8,
       "aphx": 1.0
+    },
+    "Roll": {
+      "spread": 0.06,
+      "fold": 0.25,
+      "cutoff": 0.6,
+      "res": 0.3,
+      "shape": 0,
+      "noise": 0,
+      "drive": 0.2,
+      "aphx": 0.3
     }
   },
   "resources": {
-    "voiceBytes": 32,
+    "voiceBytes": 40,
     "voiceAlignment": 4,
     "voiceCapacity": 8,
-    "sharedBytes": 0,
+    "sharedBytes": 4,
     "outputPeakQ31": 1073741824,
     "display": {
       "stateBytes": 52,

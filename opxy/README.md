@@ -39,7 +39,12 @@ The OP-XY and the OP-1 are different instruments, and the SDKs reflect that. The
 
 Both engines keep their integer DSP byte for byte where the block size allows. The 0..32767 control range is taken from the top 15 bits of each Q31 word, so the knob curves are the OP-1's. Envelope ramps are per 64 samples instead of 128.
 
-**toro** gets the split it never had room for on the OP-1: Drive and Aphx are separate slots on page 2. Velocity is gone from the engine, so APHX's accent-deepening is gone with it (the XY's velocity reaches the track level instead).
+**toro** gets the split it never had room for on the OP-1: Drive and Aphx are separate slots on page 2. Two things are new on the XY:
+
+- **Aphx is split at its centre.** Centre is off. Right of centre is the OP-1's per-key drift: every key keeps its own detune, cutoff, fold and resonance offsets. Left of centre is the same drift re-rolled on every note, from the track's note count instead of the key. So locking a single sequencer step to the left side re-rolls just that step, and the same pattern still plays back the same way.
+- **An accent stands in for velocity.** The XY doesn't give engines velocity, so toro steps its own accent once per note, the way theseus steps its hit LFO: a four-note cycle of strong, weak, medium, weak, locked to the sequence. An accent deepens Aphx on that note (by half when strong, a quarter when medium), so it's silent with Aphx at centre. The count lives in `Shared`, so every voice on the track follows the same cycle.
+
+There's a new preset, Roll, to hear the per-step side.
 
 **theseus** keeps the per-hit LFO. Its phase lives in the machine's `Shared` state so every voice steps the same LFO, as on the OP-1. The two envelope divides per block became a reciprocal (the Blackfin+ has no divide). The eighth slot is new: **Tune**, -24 to +24 semitones, which shifts which drum a note picks without changing the note. On the XY the sequencer plays fixed pitches, so this is how you move a whole pattern from toms to hats. Velocity accents are gone from the engine; the XY's own velocity path stands in.
 
@@ -60,7 +65,7 @@ Both screens were designed first, frame by frame and in motion, in my [operators
 | Shape | saw to triangle: the ridges go from a sharp leading edge to symmetric | Noise | sparks off the struck head, more on the high drums |
 | Noise | a fixed jitter in every column | LFO | some hits jump higher than others, following the hit LFO |
 | Drive | the tallest columns flatten to a plateau | Rate | the floor is the LFO's clock: one dash per hit of the cycle (32 .. 2), the current one lit |
-| Aphx | each column drifts by its own amount, different for each note | Tune | shifts which tier the hits land on |
+| Aphx | each column drifts by its own amount: fixed per landing spot right of centre, re-rolled every note left of it; accented notes drift further | Tune | shifts which tier the hits land on |
 
 Greyscale was less of a loss than I expected. The OP-1 screens already gave every control its own shape so colour was never the only cue; on the XY the shapes do all the work, with grey levels for lit against unlit.
 

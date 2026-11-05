@@ -9,7 +9,9 @@
  *   Shape   (page 2) saw to triangle: the main wave's ridges go from a sharp leading edge to symmetric
  *   Noise   (page 2) a fixed jitter in every column
  *   Drive   (page 2) soft clip: the tallest columns flatten to a plateau
- *   Aphx    (page 2) drift: each column wanders by its own amount, different for each note's landing spot
+ *   Aphx    (page 2) split at centre (off). Right: each column wanders by its own amount, set by where the note
+ *           lands; left: a fresh wander on every note. Accented notes (strong, weak, medium, weak, as the engine
+ *           steps them) wander further
  *   a note  rolls the wave forward a step, pushes a patch of six slabs up with white tops, and sends a ripple out
  *           across the field; everything settles in under a second, and the idle field doesn't move
  * The drawing input carries no pitch, so notes land on eight spots in turn rather than by key.
@@ -80,6 +82,14 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     char values[8][header_capacity];
     for (u32 i = 0; i < 8; ++i) header_amount(values[i], header_capacity, in.slots[i]);
     { const i32 r = 100 + ((q10(in.slots[0]) * 50 + 512) >> 10); values[0][0] = '1'; values[0][1] = '.'; values[0][2] = static_cast<char>('0' + (r / 10) % 10); values[0][3] = static_cast<char>('0' + r % 10); values[0][4] = 0; }
+    {   /* Aphx is bipolar: -100 (per step) .. 0 (off) .. +100 (per key) */
+        const i32 a = ((q10(in.slots[7]) - 512) * 200 + (in.slots[7] >= 0x40000000 ? 512 : -512)) / 1024;
+        char* o = values[7]; i32 m = a < 0 ? -a : a;
+        if (a < 0) *o++ = '-'; else if (a > 0) *o++ = '+';
+        if (m >= 100) *o++ = '1';
+        if (m >= 10) *o++ = static_cast<char>('0' + (m / 10) % 10);
+        *o++ = static_cast<char>('0' + m % 10); *o = 0;
+    }
     const opxy::u8 slots[2][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 } };
     page_header(st.header, in, fr, titles, values, N_HDR, slots);
 
@@ -95,7 +105,12 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     const u32 key = played ? (st.n - 1) % KEY_SPOT_N : 0;
 
     const i32 spread = q10(in.slots[0]), fold = q10(in.slots[1]), cut = q10(in.slots[2]), res = q10(in.slots[3]);
-    const i32 shape = q10(in.slots[4]), noise = q10(in.slots[5]), drive = q10(in.slots[6]), aphx = q10(in.slots[7]);
+    const i32 shape = q10(in.slots[4]), noise = q10(in.slots[5]), drive = q10(in.slots[6]);
+    const i32 w7 = q10(in.slots[7]);
+    const bool per_step = w7 < 512;
+    i32 aphx = clamp(iabs(w7 - 512) * 2 - 8, 0, unit);                             /* distance from centre, as the engine */
+    {   static const i32 ACCENT[4] = { 512, 0, 256, 0 };                          /* strong, weak, medium, weak: +50 %, +25 % */
+        if (played) aphx = clamp(aphx + ((aphx * ACCENT[(st.n - 1) & 3u]) >> 10), 0, unit); }
 
     /* a note: the wave rolls forward 0.11 of a cycle, easing in over ~0.2 s; the patch lifts 22 px and settles; tops
      * flash for 120 ms; a ripple spreads 14 columns a second and fades */
@@ -114,7 +129,8 @@ inline void display(DisplayState& st, const Input& in, Frame& fr)
     const i32 ceiling = unit - ((614 * drive) >> 10);                              /* Drive: clip at 1 - 0.6 drive */
     const i32 a3 = (((aphx * aphx) >> 10) * aphx) >> 10;
     const i32 drift = (((410 * aphx) >> 10) + ((614 * a3) >> 10)) * 461 >> 10;    /* 0.45 (0.4a + 0.6a^3) */
-    const i32 key_turn = static_cast<i32>(key) * 974;                              /* 1.7 rad per landing spot, tenths */
+    /* per key: 1.7 rad per landing spot; per step: a fresh angle for every note */
+    const i32 key_turn = per_step ? static_cast<i32>(((st.n * 2654435761u) >> 16) % 3600u) : static_cast<i32>(key) * 974;
     const i32 lit_row = res > 51 ? (6 * res + 512) >> 10 : -1;
 
     /* the drum: the field bends through 1.9 pi c about its middle row, c easing in from Fold 0.05. Per row i:

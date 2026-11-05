@@ -35,7 +35,7 @@ PILLAR = 12                             # the side faces: a slab this thick
 WIRE_SCATTER = 0.28                     # share of columns that are always hollow
 KEY_SPOTS = [(2, 2), (6, 1), (4, 4), (8, 3), (1, 5), (5, 6), (7, 5), (3, 1)]   # where successive notes land
 # rest values, matching definition.json's defaults: the fragment is drawn at these
-DEFAULTS = {'spread': 0.06, 'fold': 0.18, 'cutoff': 0.55, 'res': 0.24, 'shape': 0.0, 'noise': 0.0, 'drive': 0.0, 'aphx': 0.0}
+DEFAULTS = {'spread': 0.06, 'fold': 0.18, 'cutoff': 0.55, 'res': 0.24, 'shape': 0.0, 'noise': 0.0, 'drive': 0.0, 'aphx': 0.5}   # Aphx 0.5 is its centre: off
 
 # palette: (fill, stroke, width). Solid faces stroke in their own fill, so neighbouring faces meet without a seam.
 PALETTE = [(G[1], G[1], 0.3), (G[3], G[3], 0.3), (G[4], G[4], 0.3), (G[5], G[5], 0.3), (G[6], G[6], 0.3),
