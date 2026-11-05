@@ -1,6 +1,6 @@
 # meikyu, the OP-XY player
 
-This is meikyu's shift register as an OP-XY **note player**, the stage between the keys (or the XY's sequencer) and the track's instrument where the stock Arpeggio, Maestro and Hold live. It builds against the Open-XY SDK's `firmware/native-players` branch (SDK 1.7 draft, pinned below), which is not merged yet. I wrote it because the XY has no sequencer plugins and never will through the SDK, and this is the one place a generative note source can sit.
+This is meikyu's shift register as an OP-XY **note player**, the stage between the keys (or the XY's sequencer) and the track's instrument where the stock Arpeggio, Maestro and Hold live. It started on the Open-XY SDK's `firmware/native-players` branch; players have since landed on `main` as SDK 1.8, and that's what it targets now. I wrote it because the XY has no sequencer plugins and never will through the SDK, and this is the one place a generative note source can sit.
 
 ## What it does
 
@@ -24,7 +24,7 @@ The labyrinth from the OP-1 screen: the sixteen steps sit on the spiral as diamo
 ## Build and test
 
 ```sh
-# in a checkout of etcetc000/open-xy at the pinned branch commit
+# in a checkout of etcetc000/open-xy (main, SDK 1.8 or later)
 python sdk.py test --machine ../labyrinth/opxy/machines/meikyu
 python sdk.py build --machine ../labyrinth/opxy/machines/meikyu --machine ../labyrinth/opxy/machines/toro \
     --machine ../labyrinth/opxy/machines/theseus --stock-os <private>/stock-1.2.1/os.ldr --out <builds>/labyrinth-001
@@ -32,7 +32,7 @@ python sdk.py build --machine ../labyrinth/opxy/machines/meikyu --machine ../lab
 
 `tests/phrases.cpp` checks the phrase logic on the host: determinism of the first phrase, density bounds, scales and pads, velocity as range, the frozen two-phrase repeat, corruption, the eight-root limit, release semantics and the page strings. Players have no browser audio preview; `python3 gen_panel.py > panel.svg.fragment` regenerates the artwork.
 
-Pinned SDK: `etcetc000/open-xy` branch `firmware/native-players` at `16c59b0` (2026-10-30). The player API (`<opxy/player.hpp>`) may still change before it lands; `machine.json` says `"sdk": "1.7"`.
+SDK: `machine.json` says `"sdk": "1.8"`, the version that added players; the SDK refuses a player that names anything older. I wrote it against the `firmware/native-players` branch at `16c59b0` (2026-10-30) and checked it against `main` at `2ca22e7` (2026-11-03, SDK 1.9): `<opxy/player.hpp>` and the `press`, `release`, `reset` and `display` signatures landed as they were on the branch. meikyu doesn't use the optional `update` hook that came with the merge.
 
 ## Licence
 

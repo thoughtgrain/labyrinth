@@ -4,7 +4,7 @@ This folder is my port of two of the three labyrinth plugins to the teenage engi
 
 - **toro**: the two-oscillator wavefolder synth, with APHX. On the XY its screen is a star chart: Taurus, with the controls on the stars and comets.
 - **theseus**: the DFAM-style percussion voice.
-- **meikyu**: the shift register as a note player (phrase mode), against the SDK's unmerged `firmware/native-players` branch. See [What about meikyu?](#what-about-meikyu).
+- **meikyu**: the shift register as a note player (phrase mode), on SDK 1.8, the release that added players. See [What about meikyu?](#what-about-meikyu).
 
 ![toro on the XY: Taurus at rest](docs/toro_rest.png)
 
@@ -64,7 +64,7 @@ Two XY-specific things worth knowing, plus the device's own drawing rules:
 
 - **The screen doesn't know the pitch.** The XY tells a display how many notes are held and counts note starts; it doesn't say which note. On the OP-1 the engine told the screen which drum zone a hit landed in. Here theseus's screen walks a stand-in pattern (kick-heavy, like a DRM pattern, seeded by the note count) to decide which drum the sticks hit. The sound follows the real pitch; the drawing follows a plausible one. The head still turns toward the drum it draws.
 - **Paint comes from a palette.** A part painted "fill and stroke" takes both from one palette entry, so the palette has two halves: entries 0..7 a near-black fill with an outline from dim to white, 8..15 solid greys. Most parts are painted `keep` now and carry their own greys in the artwork; the palette is for the few that change (the eye highlights, the lasso, the ripple rings).
-- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 68 nodes, theseus 143. `tools/panel_lint.py` checks all three panels against those rules; run it after regenerating artwork.
+- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device", now folded into "Artwork" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 68 nodes, theseus 143. The SDK has since added two more for authored artwork: numbers carry at most four fractional digits and no exponent, and a bound element's transform is none or `matrix(1 0 0 1 x y)`. `tools/panel_lint.py` checks all three panels against all of those rules; run it after regenerating artwork.
 
 ## Build and try
 
@@ -90,7 +90,7 @@ If you change the artwork, regenerate it: `python3 gen_panel.py` in toro's or th
 | `sdk.py test` on both: preview ABI, memory, peak bounds, every frame valid | passed |
 | CPU estimate (host-timed, not the device) | toro about 9–11 k, theseus about 13–15 k instructions per voice block at the heaviest setting; the aim is 15 k |
 | Screens in the SDK's browser workbench | checked |
-| meikyu player: host test against the `firmware/native-players` branch | passed; not yet heard on hardware |
+| meikyu player: host test against the `firmware/native-players` branch | passed; not yet heard on hardware. Checked by reading against SDK 1.9 `main` (`2ca22e7`): API unchanged, `machine.json` moved to `"sdk": "1.8"`; not yet re-run there |
 | Firmware build and the OP-XY itself | **not done**: no Blackfin+ toolchain or XY here. The catalog also needs a hardware CPU measurement (`docs/profiling.md` in the SDK) |
 
 theseus is the one to measure first: at its heaviest setting (full FM and noise, a long decay) the estimate sits at the aim. If the device says it is over, the noise mix and the FM index are the two things to make cheaper.
@@ -99,7 +99,7 @@ theseus is the one to measure first: at its heaviest setting (full FM and noise,
 
 The OP-XY has no sequencer plugins. The SDK offers synths, sample engines and effects, plus "extensions" that observe firmware events, and the two events a sequencer would need (a pattern step playing, notes reaching a track) are listed as not exposed. The right home for meikyu on the XY is a **player**, the XY's own note-effect stage (arpeggio, maestro, hold).
 
-The SDK's author has that in progress: the `firmware/native-players` branch of `etcetc000/open-xy` (SDK 1.7 draft, six hooks into the stock Maestro object, a `<opxy/player.hpp>` API) with a Chords player as the example in `open-xy-core-machines`. A player answers key presses with a plan of up to eight timed tones; it has no clock and can't sound a note on its own. So `machines/meikyu/` is meikyu as a **phrase player**: every note, live or sequenced, plays the next eight steps of the self-corrupting register, rooted on that note, and the pattern drifts across the bar. Its [README](machines/meikyu/README.md) has the controls and what's missing against the OP-1. It passes the branch's `sdk.py test` on the host and is waiting on a firmware build to be heard; the branch is unmerged, so the API may still move under it.
+The SDK added that in 1.8: it started as the `firmware/native-players` branch of `etcetc000/open-xy` (six hooks into the stock Maestro object, a `<opxy/player.hpp>` API) and is on `main` now with a Chords player as the example in `open-xy-core-machines`. A player answers key presses with a plan of up to eight timed tones; it has no clock and can't sound a note on its own. So `machines/meikyu/` is meikyu as a **phrase player**: every note, live or sequenced, plays the next eight steps of the self-corrupting register, rooted on that note, and the pattern drifts across the bar. Its [README](machines/meikyu/README.md) has the controls and what's missing against the OP-1. It passed the branch's `sdk.py test` on the host, and the merged API is the same one it was written against; it's waiting on a firmware build to be heard.
 
 ## Licence
 

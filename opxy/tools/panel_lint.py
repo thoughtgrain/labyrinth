@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Check a panel.svg.fragment against the OP-XY's drawing rules.
 
-These are the hardware findings in the Open-XY SDK's docs/display.md, "Drawing on the device" (PR 260), checked
-on the authored artwork before it goes anywhere near a device:
+These are the hardware findings in the Open-XY SDK's docs/display.md (first "Drawing on the device", PR 260, now
+folded into its "Artwork" section), checked on the authored artwork before it goes anywhere near a device:
 
   - every path is one subpath of at most 64 points (compound paths stopped the device at launch)
   - no turn within 2.5 degrees of straight back (a near-reversal draws a streak); 180-degree turns are the usual
     case, from a line traced out and back
   - neighbouring points at least 1/8 px apart (closer points merge and the outline stops reshaping)
   - the closing edge, from the last point back to the first, at least 1/4 px (shorter draws a sliver)
+  - authored numbers have at most four fractional digits and no exponent notation (the packager rejects the rest)
+  - a bound element (<prefix>_node_/_text_/_palette_/_dot_/_key_/_played_<i>) has no transform or a plain
+    matrix(1 0 0 1 x y): every frame replaces its whole transform, so anything else is a pose the device never keeps
 
 Curves are flattened for the angle checks. Paths the SDK prescribes (the player keyboards' H/V rectangles) are
 parsed with H and V. Exit status is the number of findings.
@@ -50,6 +53,29 @@ def flatten(d):
     if pts:
         subpaths.append(pts)
     return subpaths
+
+
+LONG_FRACTION = re.compile(r'\d\.\d{5,}')
+EXPONENT = re.compile(r'(?<![#\w.])-?\d*\.?\d+[eE][-+]?\d+')
+BOUND = re.compile(r'_(?:node|text|palette|dot|key|played)_\d+$')
+PLAIN_MATRIX = re.compile(r'\s*matrix\(\s*1\s+0\s+0\s+1\s+(' + NUMBER + r')\s+(' + NUMBER + r')\s*\)\s*')
+
+
+def check_numbers(el, name, out):
+    """Every numeric attribute: at most four fractional digits, no exponent. Colours and IDs are not numbers."""
+    for key, value in el.attrib.items():
+        if key == 'id' or value.startswith('#'):
+            continue
+        bad = LONG_FRACTION.search(value) or EXPONENT.search(value)
+        if bad:
+            out.append(f'{name}: {key.split("}")[-1]}="{value[:40]}" has {bad.group(0)!r} (four fractional digits, no exponent)')
+
+
+def check_transform(el, name, out):
+    """A bound element's authored transform is none or matrix(1 0 0 1 x y)."""
+    transform = el.get('transform')
+    if transform is not None and BOUND.search(el.get('id', '')) and not PLAIN_MATRIX.fullmatch(transform):
+        out.append(f'{name}: transform="{transform}" (a bound element takes none or matrix(1 0 0 1 x y))')
 
 
 def coordinate_pairs(d):
@@ -94,10 +120,13 @@ def check(path):
     out = []
     root = ET.fromstring(open(path, encoding='utf-8').read())
     for el in root.iter():
-        if el.tag.split('}')[-1] != 'path':
+        tag = el.tag.split('}')[-1]
+        name = el.get('id') or f'(static {tag})'
+        check_numbers(el, name, out)
+        check_transform(el, name, out)
+        if tag != 'path':
             continue
         d = el.get('d', '')
-        name = el.get('id') or '(static path)'
         subpaths = flatten(d)
         if len(subpaths) > 1:
             out.append(f'{name}: {len(subpaths)} subpaths (one allowed)')
