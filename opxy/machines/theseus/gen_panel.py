@@ -1,317 +1,299 @@
 #!/usr/bin/env python3
-"""panel.svg.fragment and nodes.h for theseus on the OP-XY: the PHALANX screen as retained artwork.
+"""panel.svg.fragment and nodes.h for theseus on the OP-XY: the TOWER screen, the kit stacked as a drum tower.
 
-Static: the kit's shells, hoops, lugs and stands, the pedal, the drummer's cuirass. Moving parts are nodes that
-display.cpp places, turns, scales, repaints or hides every frame: the five helmet heads (shown one at a time), the
-crest's bristles, the eyes, the arms and sticks, the kick beater, the cymbals, ripple rings, sizzle specks and the
-sway arcs. The device's drawing rules (Open-XY docs/display.md, "Drawing on the device") shape the cut: every path
-is ONE subpath of at most 64 points, so a head is a GROUP of parts sharing the neck pivot, moved together by
-display.cpp; fills come from the artwork, so parts carry their own greys and are painted `keep`; lines are thin
-closed ribbons with flat ends and no turn near straight back.
+Theseus is one voice that plays the whole kit; the note picks the drum. So the screen is the kit, stacked from the
+kick at the base to the hi-hat on top, each tier drawn as the drum it plays (the kick's wrap stripe and beater patch,
+the floor tom's legs, the snare's wires, the rack tom's mount, the hi-hat's rod). It's a line drawing: black shapes
+with grey outlines, so five overlapping drums stay separate. Only the drum that's hit moves, only upward, and only
+its head fills with light. The floor under the kick is the hit LFO's clock. display.cpp has the control mapping.
 
-The kit keeps the OP-1's layout in its units, stretched to the XY's wider screen: x by SX about the kit's centre,
-y by SY from the header down. The helmet is uniform (HELM) about the neck pivot. Node indices are assigned here and
-written to nodes.h.
+How it's cut for the device (Open-XY docs/display.md, "Artwork"):
+  - Every tier is a group of nodes sharing one origin, the centre of its head, so a hit lifts the tier with one
+    translation per node and nothing can come apart. Rings and overtone hoops are per tier too, authored round that
+    same origin at full size and scaled.
+  - The hi-hat's two cymbals each share a pivot, the cymbal's own centre, so display.cpp can rock them with a turn.
+  - Lines are closed ribbons, hoops are C-shaped ribbons with a hairline gap (every point distinct, no repeated
+    seam point), and every path is one subpath of at most 64 points.
+  - The floor clock is pre-drawn for each of the ten Rate settings (2..32 dashes, 121 nodes); only the set for the
+    current Rate is shown. The lit step's slice of the floor is the one mutable outline (path 0).
+  - Stroke widths and colours come from the palette entries below, so a node's look is its shade.
 
-    python3 gen_panel.py          # writes panel.svg.fragment, nodes.h and the node count into definition.json
+The design and its contact sheet live in the operators repository (screens/theseus/concepts/d4_video.py, the
+theseus-tower entry in library/, pattern P11).
+
+    python3 gen_panel.py          # writes panel.svg.fragment, nodes.h and the display block in definition.json
 Copyright (c) 2026 briannhinton. MIT."""
 import json
 import math
 from pathlib import Path
 
-K = 0.5523
-# the print's palette, inverted for the black screen: light fills, ink detail, a cream for highlights and the crest
-INK, PAPER, CREAM, DIM, LITE, BLACK, SEC = '#0A0A0A', '#C9C9C9', '#E2E2E2', '#8A8A8A', '#F0F0F0', '#000000', '#A4A4A4'
-SHELL, HEAD, EDGE, DEC = PAPER, CREAM, INK, SEC
-HELM, HELM_DARK, SLOT, BRONZE = PAPER, INK, INK, CREAM
-SX, SY = 1.6, 1.3             # the kit's stretch: OP-1 units -> pixels
 HERE = Path(__file__).resolve().parent
+PREFIX = 'theseus'
+G = ['#000000', '#323232', '#4B4B4B', '#646464', '#7D7D7D', '#969696', '#AFAFAF', '#CDCDCD']
+CX = 240
+FLOOR_Y = 194
+GAP = 9
+# the tower, bottom to top: (zone, radius, shell height, kind); the hat is drawn on the rod above the rack tom
+TIERS = [(0.02, 86, 30, 'kick'), (0.25, 62, 22, 'floor'), (0.45, 50, 10, 'snare'), (0.65, 38, 15, 'tom'), (0.88, 36, 0, 'hat')]
+RATES = [32, 24, 18, 14, 10, 8, 6, 4, 3, 2]
+DEFAULT_RATE = 4                              # Rate 0.49 -> ten hits, as the engine reads it
+SPARKS = 24
+OVER_R = 62                                    # the shared overtone hoops are authored at the floor tom's size
+SLICE_POINTS = 64
+
+# palette: (name, fill, stroke, width)
+PALETTE = [
+    ('P_BLACK', '#000000', '#000000', 0.3),
+    ('P_SHELL', '#000000', G[5], 1.2),          # a shell's silhouette
+    ('P_SHELL_HOT', '#000000', G[7], 1.2),      # ... when its drum is hit
+    ('P_HEAD', '#000000', G[6], 1.5),           # a head or cymbal at rest (and the snare's lighter shell)
+    ('P_LIT1', G[1], G[7], 1.5), ('P_LIT2', G[2], G[7], 1.5), ('P_LIT3', G[3], G[7], 1.5),
+    ('P_LIT4', G[4], G[7], 1.5), ('P_LIT5', G[5], G[7], 1.5),   # a struck head, filled by how hard and how open
+    ('P_DIM', G[3], G[3], 0.3),                 # ribbons: hoops, lugs, wires, the rod
+    ('P_G4', G[4], G[4], 0.3),                  # the floor clock's dashes
+    ('P_G5', G[5], G[5], 0.3),                  # outer overtone hoops
+    ('P_G6', G[6], G[6], 0.3),                  # rings, sparks, the bell, the snare's lugs
+    ('P_HOT', G[7], G[7], 0.3),                 # the first ring, the lit dash
+    ('P_MOUNT', '#000000', G[3], 1.0),          # the rack tom's mount
+    ('P_SLICE', G[2], G[2], 0.6),               # the lit step's slice of the floor
+]
+P = {name: k for k, (name, *_rest) in enumerate(PALETTE)}
 
 
 def f(v):
-    s = f'{v:.3f}'.rstrip('0').rstrip('.')
+    s = f'{v:.1f}'.rstrip('0').rstrip('.')
     return '0' if s in ('-0', '') else s
 
 
-def pt(p):
-    return f'{f(p[0])},{f(p[1])}'
+def ellipse(cx, cy, rx, ry, n=36, a0=0.0, a1=2 * math.pi):
+    closed = a1 - a0 >= 2 * math.pi - 1e-6
+    return [(cx + rx * math.cos(a0 + (a1 - a0) * k / n), cy + ry * math.sin(a0 + (a1 - a0) * k / n)) for k in range(n + (0 if closed else 1))]
 
 
-def ellipse(cx, cy, rx, ry):
-    return (f'M{f(cx + rx)},{f(cy)} C{f(cx + rx)},{f(cy + K * ry)} {f(cx + K * rx)},{f(cy + ry)} {f(cx)},{f(cy + ry)} '
-            f'C{f(cx - K * rx)},{f(cy + ry)} {f(cx - rx)},{f(cy + K * ry)} {f(cx - rx)},{f(cy)} '
-            f'C{f(cx - rx)},{f(cy - K * ry)} {f(cx - K * rx)},{f(cy - ry)} {f(cx)},{f(cy - ry)} '
-            f'C{f(cx + K * rx)},{f(cy - ry)} {f(cx + rx)},{f(cy - K * ry)} {f(cx + rx)},{f(cy)} Z')
-
-
-def shell(cx, cy, rx, ry, h):
-    b = cy + h
-    return (f'M{f(cx - rx)},{f(cy)} L{f(cx - rx)},{f(b)} C{f(cx - rx)},{f(b + K * ry)} {f(cx - K * rx)},{f(b + ry)} {f(cx)},{f(b + ry)} '
-            f'C{f(cx + K * rx)},{f(b + ry)} {f(cx + rx)},{f(b + K * ry)} {f(cx + rx)},{f(b)} L{f(cx + rx)},{f(cy)} '
-            f'C{f(cx + rx)},{f(cy + K * ry)} {f(cx + K * rx)},{f(cy + ry)} {f(cx)},{f(cy + ry)} '
-            f'C{f(cx - K * rx)},{f(cy + ry)} {f(cx - rx)},{f(cy + K * ry)} {f(cx - rx)},{f(cy)} Z')
-
-
-def poly(pts, close=True):
-    return 'M' + ' L'.join(pt(p) for p in pts) + (' Z' if close else '')
-
-
-def ribbon(pts, w=0.5):
-    """a polyline as a thin closed ribbon offset along the normal, square ends"""
-    n = len(pts)
-    nx, ny = [], []
-    for i in range(n - 1):
-        dx, dy = pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]
+def ribbon(pts, w):
+    """an open line as a thin closed outline: one edge out, the other back w px away"""
+    left, right = [], []
+    for k, (x, y) in enumerate(pts):
+        ax, ay = pts[max(0, k - 1)]
+        bx, by = pts[min(len(pts) - 1, k + 1)]
+        dx, dy = bx - ax, by - ay
         ln = math.hypot(dx, dy) or 1
-        nx.append(-dy / ln * w / 2); ny.append(dx / ln * w / 2)
-    nx.append(nx[-1]); ny.append(ny[-1])
-    up = [(x + nx[i], y + ny[i]) for i, (x, y) in enumerate(pts)]
-    dn = [(x - nx[i], y - ny[i]) for i, (x, y) in enumerate(pts)]
-    return poly(up + list(reversed(dn)))
+        nx, ny = -dy / ln * w / 2, dx / ln * w / 2
+        left.append((x + nx, y + ny))
+        right.append((x - nx, y - ny))
+    return left + right[::-1]
 
 
-def bezier(p0, p1, p2, p3, n):
-    out = []
-    for i in range(n + 1):
-        u = i / n; v = 1 - u
-        out.append((v ** 3 * p0[0] + 3 * v * v * u * p1[0] + 3 * v * u * u * p2[0] + u ** 3 * p3[0],
-                    v ** 3 * p0[1] + 3 * v * v * u * p1[1] + 3 * v * u * u * p2[1] + u ** 3 * p3[1]))
-    return out
-
-
-def bez_ribbon(p0, p1, p2, p3, w, n=10):
-    return ribbon(bezier(p0, p1, p2, p3, n), w)
-
-
-def hatch(pts_a, pts_b, n, w=0.9, col=None):
-    out = []
-    for k in range(n):
-        u = (k + 0.5) / n
-        i = min(int(u * (len(pts_a) - 1)), len(pts_a) - 2)
-        t = u * (len(pts_a) - 1) - i
-        ax, ay = pts_a[i][0] + (pts_a[i + 1][0] - pts_a[i][0]) * t, pts_a[i][1] + (pts_a[i + 1][1] - pts_a[i][1]) * t
-        bx, by = pts_b[i][0] + (pts_b[i + 1][0] - pts_b[i][0]) * t, pts_b[i][1] + (pts_b[i + 1][1] - pts_b[i][1]) * t
-        out.append((ribbon([(ax, ay), (bx, by)], w), col or INK, col or INK, 0.3))
-    return out
-
-
-def star(cx, cy, r, points=4, inner=0.28):
-    pts = []
-    for k in range(points * 2):
-        a = -math.pi / 2 + k * math.pi / points
-        rr = r if k % 2 == 0 else r * inner
-        pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr))
-    return poly(pts)
-
-
-def P(x, y):                                      # OP-1 kit units -> pixels
-    return ((x - 160) * SX + 240, (y - 8) * SY + 40)
-
-
-def static(d, fill, stroke, w):
-    return f'<path d="{d}" fill="{fill if fill else "none"}" stroke="{stroke}" stroke-width="{w}"/>'
-
-
-def line(a, b, col=DEC, w=1.5):
-    return static(poly([a, b], False), None, col, w)
+def hoop(cx, cy, rx, ry, w, n=24):
+    """an elliptical ring as one outline: the outer round with a hairline gap at the back, then the inner round back"""
+    gap = 0.8 / max(ry, 0.5)                    # the gap sits at the right-hand end, where the ring is w wide
+    a0, a1 = gap / 2, 2 * math.pi - gap / 2
+    ryw = w * ry / rx
+    outer = ellipse(cx, cy, rx + w / 2, ry + ryw / 2, n, a0, a1)
+    inner = ellipse(cx, cy, rx - w / 2, ry - ryw / 2, n, a0, a1)
+    return outer + inner[::-1]
 
 
 class Panel:
     def __init__(self):
-        self.parts, self.groups = [], []
+        self.nodes = []            # dicts: pts (absolute), origin, shade, visible
 
-    def group(self, name, parts):
-        first = len(self.parts)
-        self.parts += parts
-        self.groups.append((name, first, len(parts)))
-        return first
+    def add(self, pts, shade, origin=(0, 0), visible=True):
+        assert 3 <= len(pts) <= 64, len(pts)
+        self.nodes.append({'pts': pts, 'origin': origin, 'shade': shade, 'visible': visible})
+        return len(self.nodes) - 1
 
-    def node(self, name, d, fill, stroke, width):
-        return self.group(name, [(d, fill, stroke, width)])
+    def svg(self, i):
+        n = self.nodes[i]
+        ox, oy = n['origin']
+        name, fill, stroke, width = PALETTE[n['shade']]
+        x, y = (ox, oy) if n['visible'] else (640, 320)
+        d = 'M' + 'L'.join(f'{f(px - ox)} {f(py - oy)}' for px, py in n['pts']) + 'Z'     # compact: the fragment must stay under 64 KiB
+        return f'<path id="{PREFIX}_node_{i}" transform="matrix(1 0 0 1 {f(x)} {f(y)})" d="{d}" fill="{fill}" stroke="{stroke}" stroke-width="{width}"/>'
 
-    def nodes_h(self):
-        lines = ['#pragma once', '// theseus for the OP-XY: node indices, written by gen_panel.py. Edit the generator, not this file.',
-                 'namespace theseus {', 'enum {']
-        for name, first, count in self.groups:
-            lines.append(f'    N_{name} = {first}, N_{name}_COUNT = {count},')
-        lines.append(f'    N_TOTAL = {len(self.parts)}')
-        lines += ['};', '}', '']
-        return '\n'.join(lines)
+
+def tops():
+    """each tier's head centre at rest, bottom to top, and the hat's base"""
+    y, out = FLOOR_Y, []
+    for z, r, h, kind in TIERS:
+        if kind == 'hat':
+            out.append(y - 6)
+            break
+        out.append(y - h)
+        y = y - h - GAP
+    return out
+
+
+def build():
+    pn = Panel()
+    order = []                                  # document order of node indices (the slice path is node 0)
+    T = tops()
+    idx = {}
+
+    # node 0: the lit step's slice of the floor, a mutable outline (centre + 63 points round the step's arc)
+    kr = TIERS[0][1]
+    frx, fry = kr + 8, (kr + 8) * 0.26
+    # authored at half size: a path's points must stay within 64 px of its origin, so display.cpp draws it at scale 2
+    wedge = [(CX, FLOOR_Y + 1)] + ellipse(CX, FLOOR_Y + 1, (frx - 2) / 2, (fry - 1) / 2, SLICE_POINTS - 2, math.pi / 2, math.pi / 2 + 0.5)
+    idx['slice'] = pn.add(wedge, P['P_SLICE'], (CX, FLOOR_Y + 1), visible=False)
+    order.append(idx['slice'])
+    # nodes 1..8: the header bar (written separately; reserve the indices)
+    idx['hdr'] = len(pn.nodes)
+    for i in range(8):
+        pn.nodes.append(None)
+
+    # the floor clock: one set of dashes per Rate setting
+    idx['dash'] = []
+    for ri, n in enumerate(RATES):
+        idx['dash'].append(len(pn.nodes))
+        gap = 0.18 if n <= 8 else 0.32
+        seg = max(2, round(24 / n))
+        for k in range(n):
+            a0 = math.pi / 2 + 2 * math.pi * (k + gap / 2) / n
+            a1 = math.pi / 2 + 2 * math.pi * (k + 1 - gap / 2) / n
+            order.append(pn.add(ribbon(ellipse(CX, FLOOR_Y + 1, frx, fry, seg, a0, a1), 2.6), P['P_G4'], (CX, FLOOR_Y + 1), visible=ri == DEFAULT_RATE))
+
+    # fm's overtone hoops: one shared set of four, thrown off whichever drum was hit last, behind the whole tower
+    idx['over'] = len(pn.nodes)
+    for k in range(4):
+        order.append(pn.add(hoop(CX, 133, OVER_R, OVER_R * 0.26, 1.0), P['P_G6'] if k == 0 else P['P_G5'], (CX, 133), visible=False))
+
+    # the drums
+    tiers = []
+    for t, (z, r, h, kind) in enumerate(TIERS[:-1]):
+        top = T[t]
+        ry = r * 0.26
+        o = (CX, top)
+        first = len(pn.nodes)
+        rec = {}
+
+        def add(pts, shade, visible=True):
+            k = pn.add(pts, shade, o, visible)
+            order.append(k)
+            return k
+        if kind == 'floor':
+            for sx in (-1, 1):
+                add(ribbon([(CX + sx * (r - 3), top + h * 0.35), (CX + sx * (r + 8), top + h + 6)], 1.4), P['P_DIM'])
+        if kind == 'snare':
+            for k in range(4):
+                yy = top + h + ry * 0.55 + 1.6 * k
+                add(ribbon([(CX - r * 0.6, yy), (CX + r * 0.6, yy)], 0.8), P['P_DIM'])
+        body = [(CX - r, top)] + ellipse(CX, top + h, r, ry, 24, math.pi, 0) + [(CX + r, top)]
+        rec['body_rest'] = P['P_HEAD'] if kind == 'snare' else P['P_SHELL']
+        rec['body'] = add(body, rec['body_rest'])
+        add(ribbon(ellipse(CX, top + h - 2, r, ry, 24, math.pi, 0), 1.0), P['P_DIM'])
+        if kind == 'kick':
+            for yy in (0.38, 0.6):
+                add(ribbon(ellipse(CX, top + h * yy, r, ry, 24, math.pi, 0), 1.0), P['P_DIM'])
+        if kind == 'tom':
+            add([(CX - r - 7, top + h * 0.3), (CX - r, top + h * 0.3), (CX - r, top + h * 0.7), (CX - r - 7, top + h * 0.7)], P['P_MOUNT'])
+        nl, inset, lug = {'kick': (8, 0.12, 'P_DIM'), 'floor': (4, 0.22, 'P_DIM'), 'snare': (8, 0.3, 'P_G6'), 'tom': (3, 0.22, 'P_DIM')}[kind]
+        for k in range(nl):
+            a = math.pi * (0.15 + 0.7 * k / max(1, nl - 1))
+            lx, ly = CX + r * math.cos(a) * 0.98, top + h * 0.5 + ry * math.sin(a)
+            add(ribbon([(lx, ly - h * inset), (lx, ly + h * inset)], 1.4), P[lug])
+        rec['batter'] = add(ellipse(CX, top, r, ry, 32), P['P_HEAD'])
+        rec['ring'] = len(pn.nodes)
+        for k in range(4):                                   # decay's rings, spreading across the head
+            add(hoop(CX, top, r * 0.84, ry * 0.84, 1.0, 20), P['P_HOT'] if k == 0 else P['P_G6'], visible=False)
+        if kind == 'kick':
+            add(hoop(CX + r * 0.3, top + ry * 0.12, r * 0.15, ry * 0.15, 1.0, 16), P['P_DIM'])
+        rec.update({'first': first, 'count': len(pn.nodes) - first, 'top': top, 'r': r, 'ry': ry, 'zone': z})
+        tiers.append(rec)
+
+    # the hi-hat: a rod, two cymbals each pivoting on its own centre, and fm's shimmer arcs
+    base = T[-1]
+    r = TIERS[-1][1]
+    ry = r * 0.22
+    hat = {'base': base, 'r': r}
+    hat['rod'] = pn.add(ribbon([(CX, base - 30), (CX, base + 6)], 1.4), P['P_DIM'], (CX, base))
+    order.append(hat['rod'])
+    for name, y in (('low', base + 2), ('top', base - 3)):
+        hat[name] = len(pn.nodes)
+        for pts, shade in ((ellipse(CX, y, r, ry, 32), 'P_HEAD'), (hoop(CX, y, r * 0.45, ry * 0.45, 0.8), 'P_DIM'),
+                           (hoop(CX, y, r * 0.75, ry * 0.75, 0.8), 'P_DIM'), (hoop(CX, y - 0.6, r * 0.13, ry * 0.35, 1.0, 12), 'P_G6')):
+            order.append(pn.add(pts, P[shade], (CX, y)))
+    hat['shim'] = len(pn.nodes)
+    for k in range(4):
+        a = -0.5 - 0.45 * k
+        order.append(pn.add(ribbon(ellipse(CX, base - 3, r + 4 + 3 * k, ry + 2 + k, 8, a - 0.3, a + 0.3), 1.0), P['P_G6'], (CX, base - 3), visible=False))
+
+    # noise's sparks: one shared pool of small squares, authored round their own centres
+    hat['spark'] = len(pn.nodes)
+    for k in range(SPARKS):
+        order.append(pn.add([(-1.5, -1.5), (1.5, -1.5), (1.5, 1.5), (-1.5, 1.5)], P['P_G6'], (0, 0), visible=False))
+    return pn, order, idx, tiers, hat
+
+
+def header_fragment(first):
+    o = ['<!-- SDK two-page header: keep this block before machine artwork below y=38. -->',
+         '<path d="M0,0 L480,0 L480,38 L0,38 Z" fill="#000000" stroke="none"/>']
+    for i in range(8):
+        o.append(f'<path id="{PREFIX}_node_{first + i}" transform="matrix(1 0 0 1 {60 * i} 0)" d="M0,0 L60,0 L60,20 L0,20 Z" fill="{G[i]}" stroke="{G[i]}" stroke-width="0.5"/>')
+    for k in range(4):
+        o.append(f'<text id="{PREFIX}_text_{k}" transform="matrix(1 0 0 1 {5 + 120 * k} 10)" fill="{"#CBCBCB" if k < 2 else "#000000"}" font-family="UniversNextPro-Light" font-size="10px">-</text>')
+    for k in range(4):
+        o.append(f'<text id="{PREFIX}_text_{4 + k}" transform="matrix(1 0 0 1 {65 + 120 * k} 17.4)" fill="{"#CBCBCB" if k < 2 else "#000000"}" font-family="UniversNextPro-Light" font-size="20px">-</text>')
+    for k in range(4):
+        o.append(f'<text id="{PREFIX}_text_{8 + k}" transform="matrix(1 0 0 1 {5 + 120 * k} 33)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10px">-</text>')
+    for k in range(4):
+        o.append(f'<text id="{PREFIX}_text_{12 + k}" transform="matrix(1 0 0 1 {65 + 120 * k} 33)" fill="#707070" font-family="UniversNextPro-Light" font-size="13px">-</text>')
+    return o
 
 
 def main():
-    Pn = Panel()
-    ring64 = poly([(math.cos(k * 2 * math.pi / 64) * 20, math.sin(k * 2 * math.pi / 64) * 20) for k in range(64)])
-    Pn.node('RIPPLE', ring64, None, LITE, 1.5)
-    Pn.node('SWAY', ring64, None, LITE, 1.5)
-    greys = ['#000000', '#323232', '#4B4B4B', '#646464', '#7D7D7D', '#969696', '#AFAFAF', '#CDCDCD']
-    Pn.group('HDR', [('M0,0 L60,0 L60,20 L0,20 Z', g, g, 0.5) for g in greys])
-
-    # ---- the static kit ----
-    S = []
-    # stands: hi-hat (94), ride (232), snare (122), floor tom legs, kick spurs; with tripod feet
-    for a, b in (((94, 80), (94, 132)), ((232, 69), (234, 131)), ((122, 107), (122, 131)), ((197, 120), (195, 140)), ((217, 120), (219, 140)), ((143, 126), (136, 140)), ((177, 126), (184, 140))):
-        S.append(line(P(*a), P(*b), SEC, 2.2))
-    for c in ((87, 140), (94, 131), (101, 140)), ((227, 140), (234, 130), (241, 140)), ((115, 140), (122, 130), (129, 140)):
-        S.append(static(poly([P(*p) for p in c], False), None, SEC, 1.8))
-        for p in (c[0], c[2]):                                       # rubber feet
-            x, y = P(*p); S.append(static(ellipse(x, y, 2.6, 1.6), SEC, SEC, 0.5))
-    # the hi-hat's clutch and the ride stand's tilter
-    x, y = P(94, 84); S.append(static(poly([(x - 2.5, y), (x + 2.5, y), (x + 2.5, y + 5), (x - 2.5, y + 5)]), SEC, SEC, 0.5))
-    x, y = P(233, 72); S.append(static(ellipse(x, y, 2.4, 2.4), SEC, SEC, 0.5))
-    # the drummer's cuirass: the breastplate, its central ridge, two shoulder plates and a skirt of pteruges strips
-    cx, cy = P(158, 95)
-    S.append(static(f'M{f(cx - 27)},{f(cy)} C{f(cx - 24)},{f(cy - 10)} {f(cx - 13)},{f(cy - 13)} {f(cx)},{f(cy - 13)} C{f(cx + 13)},{f(cy - 13)} {f(cx + 24)},{f(cy - 10)} {f(cx + 27)},{f(cy)} L{f(cx + 20)},{f(cy + 17)} L{f(cx - 20)},{f(cy + 17)} Z', PAPER, INK, 2))
-    S.append(static(ribbon([(cx, cy - 10), (cx, cy + 14)], 1.4), INK, INK, 0.3))
-    for sd in (-1, 1):
-        S.append(static(bez_ribbon((cx + sd * 10, cy - 11), (cx + sd * 16, cy - 2), (cx + sd * 14, cy + 6), (cx + sd * 18, cy + 15), 1.2, 8), INK, INK, 0.3))   # muscle lines
-        S.append(static(poly([(cx + sd * 20, cy - 9), (cx + sd * 30, cy - 5), (cx + sd * 29, cy + 2), (cx + sd * 22, cy + 1)]), CREAM, INK, 1.4))    # shoulder plates
-        for d_, fill, stroke, w in hatch([(cx + sd * 22, cy + 3), (cx + sd * 20, cy + 10), (cx + sd * 19, cy + 15)], [(cx + sd * 17, cy + 3), (cx + sd * 15.5, cy + 9), (cx + sd * 14.5, cy + 14)], 4, 1.0):
-            S.append(static(d_, fill, stroke, w))                                                                           # flank hatching
-    for k in range(-3, 4):
-        x0 = cx + k * 5.6
-        S.append(static(poly([(x0 - 2.2, cy + 17), (x0 + 2.2, cy + 17), (x0 + 2.6, cy + 26), (x0 - 2.6, cy + 26)]), PAPER, INK, 1.2))                      # pteruges
-        S.append(static(ribbon([(x0, cy + 19), (x0, cy + 24)], 0.9), INK, INK, 0.3))
-    # ornaments: starbursts in the print's corners
-    for sx, sy in ((36, 64), (444, 64)):
-        S.append(static(star(sx, sy, 9, 4, 0.3), CREAM, CREAM, 0.5))
-        S.append(static(star(sx + 15, sy + 14, 4, 4, 0.3), PAPER, PAPER, 0.5))
-        S.append(static(star(sx - 13, sy + 16, 3, 4, 0.3), PAPER, PAPER, 0.5))
-    # drums: snare, floor tom, rack tom: shell, lugs, hoop ring, head
-    for dcx, dcy, rx, ry, h, lugs in ((122, 98, 14, 4, 8, 5), (207, 108, 13, 4, 16, 5), (190, 88, 11, 3.5, 8, 4)):
-        x, y = P(dcx, dcy)
-        S.append(static(shell(x, y, rx * SX, ry * SY, h * SY), PAPER, INK, 1.6))
-        for k in range(lugs):
-            u = (k + 0.5) / lugs
-            lx = x - rx * SX + 2 * rx * SX * u
-            ly = y + math.sqrt(max(0, 1 - (2 * u - 1) ** 2)) * ry * SY + 3
-            S.append(static(poly([(lx - 1.5, ly), (lx + 1.5, ly), (lx + 1.5, ly + 4.8), (lx - 1.5, ly + 4.8)]), INK, INK, 0.5))
-        S.append(static(ellipse(x, y, rx * SX, ry * SY), CREAM, INK, 1.6))
-        S.append(static(ellipse(x, y, rx * SX - 3, ry * SY - 1.2), None, INK, 1))
-    S.append(line(P(176, 99), P(186, 96), SEC, 2))                                              # the rack tom's mount
-    kx, ky = P(160, 114)
-    S.append(static(ellipse(kx, ky, 22 * SX, 22 * SY), PAPER, INK, 2.2))
-    S.append(static(ellipse(kx, ky, 18.5 * SX, 18.5 * SY), CREAM, INK, 1.4))
-    for d_, fill, stroke, w in hatch([(kx + 14 * SX, ky + 6 * SY), (kx + 9 * SX, ky + 13 * SY), (kx + 2 * SX, ky + 17 * SY)], [(kx + 17 * SX, ky + 7 * SY), (kx + 11 * SX, ky + 15.5 * SY), (kx + 3 * SX, ky + 20 * SY)], 6, 1.1):
-        S.append(static(d_, fill, stroke, w))                                                   # the kick's shaded rim
-    for k in range(8):                                                                           # kick hoop claws
-        a = k * math.pi / 4 + math.pi / 8
-        lx, ly = kx + math.cos(a) * 20.2 * SX, ky + math.sin(a) * 20.2 * SY
-        S.append(static(ellipse(lx, ly, 1.9, 1.9), INK, INK, 0.5))
-    S.append(static(ellipse(kx, ky, 4.5, 4.5), INK, INK, 1))                                   # the port
-    # the pedal: footboard, chain, and the beater's hinge block
-    S.append(static(ribbon([P(158, 141.5), P(174, 139.5)], 3), CREAM, CREAM, 0.5))
-    bx, by = P(166, 139)
-    S.append(static(poly([(bx - 3, by - 2), (bx + 3, by - 2), (bx + 3, by + 2), (bx - 3, by + 2)]), PAPER, INK, 0.8))
-    # the bottom hat, static (the top one is a node)
-    hx, hy = P(94, 77)
-    S.append(static(ellipse(hx, hy + 4, 13 * SX, 2.6 * SY), PAPER, INK, 1.2))
-
-    # ---- the five heads: the OP-1's helmet geometry (helmet units, origin at the neck pivot, +x faces right), each a
-    # group: bowl, stalk, holders, brow band, cheek rivets and the face openings. Left-facing heads mirror the right ----
-    def bez(p1, p2, p3):
-        return f'C{pt(p1)} {pt(p2)} {pt(p3)}'
-    def M(p): return f'M{pt(p)}'
-    def L(p): return f'L{pt(p)}'
-    def profile(sign):
-        m = lambda x, y: (x * sign, y)
-        bowl = ' '.join([M(m(-16, 14)), bez(m(-20, 4), m(-21, -10), m(-14, -18)), bez(m(-8, -24), m(6, -25), m(13, -18)), bez(m(17, -14), m(19, -9), m(19.5, -4)),
-                         L(m(21, 9)), L(m(17, 10.5)), L(m(14, 4.5)), L(m(12.5, 8)), bez(m(15, 12), m(18, 16), m(19, 20)), L(m(12, 22)), bez(m(6, 22), m(0, 18), m(-4, 16)),
-                         bez(m(-8, 18), m(-12, 18), m(-16, 14)), 'Z'])
-        stalk = ' '.join([M(m(12, -22)), bez(m(7, -38), m(-17, -39), m(-28, -13)), L(m(-26.5, -12.5)), bez(m(-16, -36), m(7, -35), m(10.5, -21.5)), 'Z'])
-        return [(bowl, HELM, INK, 2.2), (stalk, CREAM, INK, 0.8),
-                (poly([m(8, -20), m(12, -24), m(15, -19)]), CREAM, INK, 1), (poly([m(-19, -13), m(-25, -14), m(-20, -9)]), CREAM, INK, 1),
-                (ribbon([m(-17, 2), m(-8, -2), m(4, -3), m(11, -4.4)], 1.4), INK, INK, 0.3),                   # brow band
-                (poly([m(*p) for p in ((6.5, -7), (11, -10), (19.6, -9.6), (19.6, -5), (11, -4.4))]), SLOT, SLOT, 0.5),     # eye slot
-                (poly([m(*p) for p in ((14.6, -5), (17, -5), (15.6, 4.8), (13.4, 4.8))]), SLOT, SLOT, 0.5),                # nose guard gap
-                (ellipse(*m(-12, 10), 1.4, 1.4), INK, INK, 0.5), (ellipse(*m(-6, 14), 1.4, 1.4), INK, INK, 0.5),   # cheek rivets
-                (ellipse(*m(15, 15), 1.4, 1.4), INK, INK, 0.5)] + hatch([m(-14, -14), m(-17, -6), m(-18, 4)], [m(-10, -13), m(-13, -6), m(-14, 3)], 4, 1.0)
-    def three_quarter(sign):
-        m = lambda x, y: (x * sign, y)
-        bowl = ' '.join([M(m(-19, -3)), bez(m(-19.5, -17), m(-10, -24.5), m(1, -24)), bez(m(12, -23.5), m(18.5, -16), m(18.5, -3)), L(m(19, 7)),
-                         bez(m(18.5, 15), m(15, 20), m(9, 22.5)), L(m(6, 22.5)), L(m(6, 9)), L(m(3, 9)), L(m(3, 23)), L(m(-3, 22)), bez(m(-10, 21), m(-16, 18), m(-18, 10)), 'Z'])
-        stalk = ' '.join([M(m(12, -21)), bez(m(6, -35), m(-14, -36), m(-23, -14)), L(m(-21.5, -13.5)), bez(m(-13, -33), m(6, -32), m(10.5, -20.5)), 'Z'])
-        return [(bowl, HELM, INK, 2.2), (stalk, CREAM, INK, 0.8),
-                (poly([m(9, -19.5), m(12.5, -23), m(15, -18.5)]), CREAM, INK, 1), (poly([m(-17, -12), m(-22, -14), m(-17.5, -9)]), CREAM, INK, 1),
-                (ribbon([m(-18, -4), m(-6, -5), m(8, -6), m(17.5, -4.5)], 1.4), INK, INK, 0.3),
-                (poly([m(*p) for p in ((6, -9.6), (16.5, -9), (17.5, -4.5), (6, -4.2))]), SLOT, SLOT, 0.5),
-                (poly([m(*p) for p in ((-9, -8.5), (3, -9.6), (3, -4.2), (-8.5, -4.2))]), SLOT, SLOT, 0.5),
-                (poly([m(*p) for p in ((3, 9), (6, 9), (6, 22.5), (3, 23))]), SLOT, SLOT, 0.5),
-                (ellipse(*m(-13, 12), 1.4, 1.4), INK, INK, 0.5), (ellipse(*m(14, 13), 1.4, 1.4), INK, INK, 0.5)] + hatch([m(-16, -12), m(-18, -4)], [m(-12, -12), m(-14, -4)], 4, 1.0)
-    def front():
-        bowl = ' '.join([M((-19.5, -4)), bez((-19.5, -17), (-11, -24), (0, -24)), bez((11, -24), (19.5, -17), (19.5, -4)), L((20, 6)), bez((19, 16), (14, 21), (7, 23)),
-                         L((3, 23)), L((3, 9)), L((-3, 9)), L((-3, 23)), L((-7, 23)), bez((-14, 21), (-19, 16), (-20, 6)), 'Z'])
-        stalk = ' '.join([M((-11, -20)), bez((-6, -29), (6, -29), (11, -20)), L((9.5, -19)), bez((5.5, -27), (-5.5, -27), (-9.5, -19)), 'Z'])
-        return [(bowl, HELM, INK, 2.2), (stalk, CREAM, INK, 0.8),
-                (poly([(-13, -18), (-10.5, -22), (-7.5, -18.5)]), CREAM, INK, 1), (poly([(13, -18), (10.5, -22), (7.5, -18.5)]), CREAM, INK, 1),
-                (ribbon([(-19.5, -3.6), (19.5, -3.6)], 1.4), INK, INK, 0.3),
-                (poly([(15.5, -9), (3, -10), (3, -4.5), (14.5, -4)]), SLOT, SLOT, 0.5), (poly([(-15.5, -9), (-3, -10), (-3, -4.5), (-14.5, -4)]), SLOT, SLOT, 0.5),
-                (poly([(-3, 9), (3, 9), (3, 23), (-3, 23)]), SLOT, SLOT, 0.5),
-                (ellipse(-14, 13, 1.4, 1.4), INK, INK, 0.5), (ellipse(14, 13, 1.4, 1.4), INK, INK, 0.5)] + hatch([(-18, -14), (-19.5, -6)], [(-14.5, -13), (-16, -6)], 4, 1.0)
-    for name, parts in (('HEAD_0', profile(-1)), ('HEAD_1', three_quarter(-1)), ('HEAD_2', front()), ('HEAD_3', three_quarter(1)), ('HEAD_4', profile(1))):
-        Pn.group(name, parts)
-    # ---- crest bristles: a unit bristle pointing -y with a flat tip, placed along the stalk ----
-    Pn.group('BRISTLE', [('M-1.0,0 L1.0,0 L0.4,-9 L-0.4,-9 Z', CREAM, CREAM, 0.4)] * 12)
-    # ---- eyes: a disc each; rays: six spokes around the eye on strong hits ----
-    Pn.node('EYE_L', ellipse(0, 0, 2.3, 2.3), '#FFFFFF', '#FFFFFF', 0.5)
-    Pn.node('EYE_R', ellipse(0, 0, 2.3, 2.3), '#FFFFFF', '#FFFFFF', 0.5)
-    Pn.group('RAYS', [(ribbon([(math.cos(a) * 3.5, math.sin(a) * 3.5), (math.cos(a) * 7.5, math.sin(a) * 7.5)], 1.2), LITE, LITE, 0.5)
-                      for a in [k * math.pi / 3 + math.pi / 6 for k in range(6)]])
-    # ---- arms: upper arm (pivot the shoulder, +x) with a bracer band; forearm + stick + tip (pivot the elbow) ----
-    for name in ('UARM_L', 'UARM_R'):
-        Pn.group(name, [(ribbon([(0, 0), (30, 0)], 5.5), PAPER, INK, 1.4), (ribbon([(3, -3.2), (3, 3.2)], 2.2), INK, INK, 0.3), (ribbon([(10, -1.6), (24, -1.6)], 0.9), INK, INK, 0.3)])
-    for name in ('FARM_L', 'FARM_R'):
-        Pn.group(name, [(ribbon([(0, 0), (26, 0)], 4.5), PAPER, INK, 1.4), (ribbon([(20, -2.6), (20, 2.6)], 2.2), INK, INK, 0.3),   # bracer
-                        (ribbon([(22, 0), (58, 0)], 2.4), CREAM, INK, 0.8), (ellipse(58.8, 0, 2.0, 2.0), CREAM, INK, 0.8)])             # stick and tip
-    # ---- kick beater (pivot the pedal, pointing -y): shaft and felt head; the thump diamond ----
-    Pn.group('BEATER', [(ribbon([(0, 0), (0, -24)], 2.2), CREAM, CREAM, 0.5), (ellipse(0, -25.5, 3.8, 3.8), PAPER, INK, 1.2)])
-    Pn.node('THUMP', 'M-7,0 L0,-7 L7,0 L0,7 Z', None, CREAM, 1.4)
-    # ---- hi-hat top and ride cymbal: a plate, a bell, and a lathe ring; wobble per frame ----
-    def cymbal(rx, ry):
-        return [(ellipse(0, 0, rx, ry), PAPER, INK, 1.4), (ellipse(0, -0.6, rx * 0.55, ry * 0.55), None, INK, 1), (ellipse(0, -0.3, rx * 0.8, ry * 0.8), None, INK, 0.7),
-                ('M-5,-1 C-5,-5 5,-5 5,-1 L4,-0.6 C4,-4 -4,-4 -4,-0.6 Z', CREAM, INK, 1)]
-    Pn.group('HAT', cymbal(13 * SX, 3 * SY))
-    Pn.group('CYM', cymbal(17 * SX, 3 * SY))
-    # ---- ripple rings (scaled per frame), sizzle specks, sway arcs ----
-    Pn.group('RING', [(ellipse(0, 0, 16, 16), None, CREAM, 1.2)] * 8)
-    Pn.group('SPECK', [(star(0, 0, 2.6, 4, 0.3), CREAM, CREAM, 0.5)] * 8)
-    Pn.group('ARC', [(ribbon([(math.cos(a) * 30, math.sin(a) * 30) for a in [-0.5 + k * 0.1 for k in range(11)]], 1.2), None, LITE, 1)] * 2)
-
-    # ---- write ----
-    o = ['<g id="theseus_panel">', '<!-- SDK two-page header: keep this block before machine artwork below y=38. -->',
-         '<path d="M0,0 L480,0 L480,38 L0,38 Z" fill="#000000"/>']
-    def element(i):
-        d, fill, stroke, width = Pn.parts[i]
-        x, y = (60 * (i - 2), 0) if 2 <= i < 10 else (640, 320)
-        return f'<path id="theseus_node_{i}" transform="matrix(1 0 0 1 {x} {y})" d="{d}" fill="{fill if fill else "none"}" stroke="{stroke}" stroke-width="{width}"/>'
-    for i in range(len(Pn.parts)):
-        if i >= 2:
-            o.append(element(i))
-        if i == 9:
-            for k in range(4):
-                o.append(f'<text id="theseus_text_{k}" transform="matrix(1 0 0 1 {5 + 120 * k} 10)" fill="{"#CBCBCB" if k < 2 else "#000000"}" font-family="UniversNextPro-Light" font-size="10px">-</text>')
-            for k in range(4):
-                o.append(f'<text id="theseus_text_{4 + k}" transform="matrix(1 0 0 1 {65 + 120 * k} 17.4)" fill="{"#CBCBCB" if k < 2 else "#000000"}" font-family="UniversNextPro-Light" font-size="20px">-</text>')
-            for k in range(4):
-                o.append(f'<text id="theseus_text_{8 + k}" transform="matrix(1 0 0 1 {5 + 120 * k} 33)" fill="#5A5A5A" font-family="UniversNextPro-Light" font-size="10px">-</text>')
-            for k in range(4):
-                o.append(f'<text id="theseus_text_{12 + k}" transform="matrix(1 0 0 1 {65 + 120 * k} 33)" fill="#707070" font-family="UniversNextPro-Light" font-size="13px">-</text>')
-            o += S                                      # the kit, under every moving part
-    o += [element(0), element(1)]                       # the two outlines on top
-    outlines = ['#2A2A2A', '#3C3C3C', '#5A5A5A', '#707070', '#8C8C8C', '#A8A8A8', '#CBCBCB', '#F0F0F0']
-    for i, s in enumerate(outlines):
-        o.append(f'<circle id="theseus_palette_{i}" cx="640" cy="0" r="1" fill="#1C1C1C" stroke="{s}" stroke-width="1.5"/>')
-    solids = ['#060608', '#2A2A2A', '#4B4B4B', '#707070', '#9A9A9A', '#B8B8B8', '#D6D6D6', '#FFFFFF']
-    for i, s in enumerate(solids):
-        o.append(f'<circle id="theseus_palette_{8 + i}" cx="640" cy="0" r="1" fill="{s}" stroke="{s}" stroke-width="1.5"/>')
+    pn, order, idx, tiers, hat = build()
+    total = len(pn.nodes)
+    o = [f'<g id="{PREFIX}_panel">'] + header_fragment(idx['hdr'])
+    o += [pn.svg(i) for i in order]
+    for i, (name, fill, stroke, width) in enumerate(PALETTE):
+        o.append(f'<path id="{PREFIX}_palette_{i}" transform="matrix(1 0 0 1 640 320)" d="M0,0 L4,0 L4,4 L0,4 Z" fill="{fill}" stroke="{stroke}" stroke-width="{width}"/>')
     o.append('</g>')
     (HERE / 'panel.svg.fragment').write_text('\n'.join(o) + '\n', encoding='utf-8')
-    (HERE / 'nodes.h').write_text(Pn.nodes_h(), encoding='utf-8')
+
+    tier_nodes = range(tiers[0]['first'], hat['spark'])
+    q = lambda v: str(int(round(v * 1024)))
+    h = ('#pragma once\n// theseus for the OP-XY: node indices and the tower\'s geometry, written by gen_panel.py.\n'
+         '// Edit the generator, not this file.\nnamespace theseus {\n')
+    h += f'enum {{ N_SLICE = {idx["slice"]}, N_HDR = {idx["hdr"]}, N_DASH = {idx["dash"][0]}, N_OVER = {idx["over"]}, OVER_R = {OVER_R}, N_TIERS = {tiers[0]["first"]}, N_TOTAL = {total} }};\n'
+    h += 'enum { ' + ', '.join(f'{name} = {k}' for k, (name, *_r) in enumerate(PALETTE)) + f', PALETTE_N = {len(PALETTE)} }};\n'
+    h += f'const int TOWER_X = {CX}, FLOOR_Y = {FLOOR_Y + 1};     // the floor clock\'s centre, px\n'
+    h += f'const int FLOOR_RX = {q(frx_of())}, FLOOR_RY = {q(fry_of())};   // the slice\'s radii, Q10 px\n'
+    h += f'const int RATE_N = {len(RATES)};\nconst unsigned char RATE_HITS[RATE_N] = {{ ' + ', '.join(map(str, RATES)) + ' };\n'
+    h += 'const short DASH_FIRST[RATE_N] = { ' + ', '.join(map(str, idx['dash'])) + ' };\n'
+    h += '// the drums, bottom to top: their nodes, rest heads, radii and the zone each one plays\n'
+    h += f'enum {{ DRUM_N = {len(tiers)}, TIER_N = {len(TIERS)}, HAT = {len(tiers)} }};\n'
+    for key, fmt in (('first', str), ('count', str), ('body', str), ('body_rest', str), ('batter', str), ('ring', str), ('top', str)):
+        h += f'const short DRUM_{key.upper()}[DRUM_N] = {{ ' + ', '.join(fmt(t[key]) for t in tiers) + ' };\n'
+    h += 'const short DRUM_R[DRUM_N] = { ' + ', '.join(str(t['r']) for t in tiers) + ' };              // px\n'
+    h += 'const short DRUM_RY[DRUM_N] = { ' + ', '.join(q(t['ry']) for t in tiers) + ' };       // Q10 px\n'
+    h += 'const short TIER_ZONE[TIER_N] = { ' + ', '.join(q(z) for z, *_r in TIERS) + ' };   // Q10\n'
+    h += f'const int HAT_BASE = {hat["base"]}, HAT_R = {hat["r"]};\n'
+    h += f'enum {{ HAT_ROD = {hat["rod"]}, HAT_LOW = {hat["low"]}, HAT_TOP = {hat["top"]}, HAT_PARTS = 4, HAT_SHIM = {hat["shim"]}, SPARK = {hat["spark"]}, SPARK_N = {SPARKS} }};\n'
+    h += '// every node\'s origin y and rest shade, from N_TIERS up to the sparks (every origin sits on x = TOWER_X)\n'
+    h += 'const short NODE_OY[SPARK - N_TIERS] = { ' + ', '.join(str(pn.nodes[i]['origin'][1]) for i in tier_nodes) + ' };\n'
+    h += 'const unsigned char NODE_SHADE[SPARK - N_TIERS] = { ' + ', '.join(str(pn.nodes[i]['shade']) for i in tier_nodes) + ' };\n'
+    h += '}\n'
+    (HERE / 'nodes.h').write_text(h, encoding='utf-8')
+
     definition = json.loads((HERE / 'definition.json').read_text(encoding='utf-8'))
-    definition['resources']['display']['nodes'] = len(Pn.parts)
+    d = definition['resources']['display']
+    d.update({'stateBytes': STATE_BYTES, 'paths': 1, 'points': SLICE_POINTS, 'nodes': total, 'texts': 16, 'palette': len(PALETTE)})
     (HERE / 'definition.json').write_text(json.dumps(definition, indent=2) + '\n', encoding='utf-8')
-    print(f'{len(Pn.parts)} nodes in {len(Pn.groups)} groups')
+    print(f'{total} nodes ({sum(t["count"] for t in tiers)} in the drums, {sum(RATES)} floor dashes, {SPARKS} sparks), {len(PALETTE)} palette entries')
+
+
+def frx_of():
+    return TIERS[0][1] + 8 - 2
+
+
+def fry_of():
+    return (TIERS[0][1] + 8) * 0.26 - 1
+
+
+STATE_BYTES = 0                                  # sizeof(DisplayState) in display.h; set below
 
 
 if __name__ == '__main__':
+    STATE_BYTES = int((HERE / 'display.h').read_text(encoding='utf-8').split('// stateBytes ')[1].split()[0])
     main()

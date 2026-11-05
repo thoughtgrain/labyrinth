@@ -1,20 +1,20 @@
 #pragma once
 #include <opxy/page_header.hpp>
 
-// theseus for the OP-XY: the PHALANX screen's state. Matches resources.display in definition.json.
+// theseus for the OP-XY: the TOWER screen's state. Matches resources.display in definition.json (gen_panel.py reads
+// the size from the stateBytes line below).
 // Copyright (c) 2026 briannhinton. MIT.
 namespace theseus {
-using Frame = opxy::draw::Frame<2, 64, 143, 16, 16>;   // paths, points, nodes, texts, palette
-struct Hit { opxy::i32 drum, t; };                      // drum index, ms since
+using Frame = opxy::draw::Frame<1, 64, 232, 16, 16>;   // paths, points, nodes, texts, palette
 struct DisplayState {
     opxy::draw::PageHeader header;     // 20
     opxy::draw::NoteTracker notes;     // 16
-    opxy::u32 serial, n, seed, clock;  // 16
-    Hit hit[4];                        // 32: the last four hits, newest first
-    opxy::i32 side_t[3];               // 12: ms since each hand / the foot last struck
-    opxy::i32 side_d[3];               // 12: the drum each struck
-    opxy::i32 any_t, sway;             // 8
-    opxy::i32 view, view_to, view_hold, lfo_sim;   // 16: the head shown, where it is going, frames held, a stand-in LFO
-    opxy::u32 initialized;             // 4
-};                                     // 136 bytes
+    opxy::u32 serial, n, initialized;  // 12: the note serial last seen, hits seen, set up
+    opxy::i32 hit_t[5];                // 20: ms since each tier (kick, floor, snare, rack tom, hat) was last hit
+    opxy::i32 amp[5];                  // 20: how high that hit jumps, Q10 px
+    opxy::i32 zone[5];                 // 20: the zone it played, Q10 (high drums ring shorter, spark more)
+    opxy::u32 hit_n[5];                // 20: its hit number, which seeds its sparks
+    opxy::i32 rock_t[2], rock_side[2]; // 16: the last two hat hits, ms since and which way they rock
+    opxy::u32 slice_key;               // 4: the floor slice's geometry key
+};                                     // stateBytes 148
 }

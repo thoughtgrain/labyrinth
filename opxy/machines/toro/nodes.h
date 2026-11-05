@@ -1,45 +1,23 @@
 #pragma once
-// toro for the OP-XY: node indices, written by gen_panel.py. Edit the generator, not this file.
+// toro for the OP-XY: node indices and the field's per-column tables, written by gen_panel.py.
+// Edit the generator, not this file.
 namespace toro {
-enum {
-    N_PATH0 = 0, N_PATH0_COUNT = 1,
-    N_PATH1 = 1, N_PATH1_COUNT = 1,
-    N_HDR = 2, N_HDR_COUNT = 8,
-    N_ALD = 10, N_ALD_COUNT = 3,
-    N_S_G1 = 13, N_S_G1_COUNT = 1,
-    N_S_G2 = 14, N_S_G2_COUNT = 1,
-    N_S_G3 = 15, N_S_G3_COUNT = 1,
-    N_S_G4 = 16, N_S_G4_COUNT = 1,
-    N_S_BETA = 17, N_S_BETA_COUNT = 1,
-    N_S_ZETA = 18, N_S_ZETA_COUNT = 1,
-    N_S_BACK = 19, N_S_BACK_COUNT = 1,
-    N_S_TAIL = 20, N_S_TAIL_COUNT = 1,
-    N_JOIN = 21, N_JOIN_COUNT = 9,
-    N_PLE = 30, N_PLE_COUNT = 7,
-    N_PLE_RING = 37, N_PLE_RING_COUNT = 10,
-    N_COMET0 = 47, N_COMET0_COUNT = 2,
-    N_COMET1 = 49, N_COMET1_COUNT = 2,
-    N_COMET2 = 51, N_COMET2_COUNT = 2,
-    N_COMET3 = 53, N_COMET3_COUNT = 2,
-    N_TWINKLE = 55, N_TWINKLE_COUNT = 12,
-    N_BAND = 67, N_BAND_COUNT = 1,
-    N_TOTAL = 68
-};
-}
-
-// chart geometry (pixels relative to the chart centre; twinkle positions absolute)
-namespace toro {
-const int CHART_CX = 240, CHART_CY = 134;
-enum { ST_ALD, ST_G1, ST_G2, ST_G3, ST_G4, ST_BETA, ST_ZETA, ST_BACK, ST_TAIL, ST_N };
-const int STAR_X[ST_N] = { 18, -6, -26, -4, -28, 110, 96, -70, -150 };
-const int STAR_Y[ST_N] = { 2, -14, -24, 16, 28, -56, 44, -6, 22 };
-const int STAR_NODE[ST_N] = { N_ALD + 1, N_S_G1, N_S_G2, N_S_G3, N_S_G4, N_S_BETA, N_S_ZETA, N_S_BACK, N_S_TAIL };
-const int JOIN_N = 9;
-const int JOIN_A[JOIN_N] = { ST_ALD, ST_G1, ST_ALD, ST_G3, ST_G1, ST_G3, ST_G2, ST_G4, ST_BACK };
-const int JOIN_B[JOIN_N] = { ST_G1, ST_G2, ST_G3, ST_G4, ST_BETA, ST_ZETA, ST_BACK, ST_BACK, ST_TAIL };
-const int PLE_X = -120, PLE_Y = -28;
-const int PLE_DX[7] = { -8, -2, 5, 9, 3, -5, 0 };
-const int PLE_DY[7] = { -4, -7, -5, 1, 5, 6, 0 };
-const int TW_X[12] = { 440, 32, 192, 337, 23, 150, 142, 466, 378, 444, 359, 452 };
-const int TW_Y[12] = { 125, 78, 189, 47, 70, 84, 75, 157, 201, 164, 104, 93 };
+enum { N_HDR = 0, N_COL = 8, COL_N = 70, N_TOTAL = 218 };
+enum { P_RIGHT = 0, P_LEFT = 1, P_TOP_LO = 2, P_TOP_MID = 3, P_TOP_HI = 4, P_LIT = 5, P_BLACK = 6, P_FLASH = 7, P_WIRE = 8, P_WIRE_TOP = 9, PALETTE_N = 10 };
+const int NX = 10, NY = 7, CUBE = 15;
+const int ORIGIN_X2 = 435, ORIGIN_Y2 = 184;    // column (0, 0)'s base centre, half pixels
+const int KEY_SPOT_N = 8;
+const unsigned char KEY_I[KEY_SPOT_N] = { 2, 6, 4, 8, 1, 5, 7, 3 };
+const unsigned char KEY_J[KEY_SPOT_N] = { 2, 1, 4, 3, 5, 6, 5, 1 };
+// columns in drawing order (back to front); column k is nodes N_COL + 3k (left face, right face, top)
+const unsigned char COL_I[COL_N] = { 0, 0, 1, 0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 8, 3, 4, 5, 6, 7, 8, 9, 4, 5, 6, 7, 8, 9, 5, 6, 7, 8, 9, 6, 7, 8, 9, 7, 8, 9, 8, 9, 9 };
+const unsigned char COL_J[COL_N] = { 0, 1, 0, 2, 1, 0, 3, 2, 1, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 6, 5, 4, 3, 2, 6, 5, 4, 3, 6, 5, 4, 6, 5, 6 };
+// Q10: the main wave's phase, the second wave's phase, the detail term, the noise draw
+const short COL_P1[COL_N] = { 0, 68, 91, 137, 159, 182, 205, 228, 250, 273, 273, 296, 319, 341, 364, 341, 364, 387, 410, 432, 455, 410, 432, 455, 478, 501, 523, 546, 501, 523, 546, 569, 592, 614, 637, 592, 614, 637, 660, 683, 705, 728, 683, 705, 728, 751, 774, 796, 819, 774, 796, 819, 842, 865, 887, 865, 887, 910, 933, 956, 956, 978, 1001, 1024, 1047, 1070, 1092, 1138, 1161, 1229 };
+const short COL_P2[COL_N] = { 0, 102, -57, 205, 46, -114, 307, 148, -11, -171, 410, 250, 91, -68, -228, 512, 353, 193, 34, -125, -284, 614, 455, 296, 137, -23, -182, -341, 558, 398, 239, 80, -80, -239, -398, 501, 341, 182, 23, -137, -296, -455, 444, 284, 125, -34, -193, -353, -512, 387, 228, 68, -91, -250, -410, 330, 171, 11, -148, -307, 273, 114, -46, -205, 216, 57, -102, 159, 0, 102 };
+const short COL_DETAIL[COL_N] = { 344, 307, 238, -704, -687, -662, 521, 570, 612, 648, 92, 17, -58, -132, -205, -629, -590, -544, -492, -435, -373, 648, 676, 697, 711, 717, 714, 704, -205, -276, -344, -408, -467, -521, -570, -373, -307, -238, -166, -92, -17, 58, 704, 687, 662, 629, 590, 544, 492, -570, -612, -648, -676, -697, -711, 58, 132, 205, 276, 344, 492, 435, 373, 307, -717, -714, -704, 467, 521, 92 };
+const short COL_NOISE[COL_N] = { -135, -203, 154, -53, 136, -146, -177, -142, 219, 65, -222, 19, 168, 119, 3, -50, -114, 157, 182, -165, -102, 214, -168, 154, 195, -14, 209, 51, -202, -157, -212, -210, 37, -35, 65, -97, 54, 223, 196, -173, -112, -45, 88, 187, 178, -100, 18, -152, 30, 24, 4, 160, -15, 68, 207, -44, -234, -80, -115, -204, -232, 255, -74, -224, -156, 126, -139, -92, 136, 59 };
+// tenths of a degree: each column's own APHX drift angle; 1: always hollow
+const short COL_APHX[COL_N] = { 0, 745, 1203, 1490, 1948, 2406, 2235, 2693, 3151, 10, 2979, 3438, 296, 754, 1213, 124, 583, 1041, 1499, 1958, 2416, 869, 1327, 1786, 2244, 2703, 3161, 19, 2072, 2531, 2989, 3447, 306, 764, 1222, 3275, 134, 592, 1051, 1509, 1967, 2426, 879, 1337, 1795, 2254, 2712, 3171, 29, 2082, 2540, 2999, 3457, 315, 774, 3285, 143, 602, 1060, 1519, 888, 1347, 1805, 2263, 2092, 2550, 3008, 3295, 153, 898 };
+const unsigned char COL_WIRE[COL_N] = { 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0 };
 }

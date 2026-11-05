@@ -2,17 +2,21 @@
 
 This folder is my port of two of the three labyrinth plugins to the teenage engineering OP-XY, built on the [Open-XY SDK](https://github.com/etcetc000/open-xy). The OP-1 versions in the folders above are untouched; this is a separate tree with its own licence (MIT, like the SDK and most XY machines).
 
-- **toro**: the two-oscillator wavefolder synth, with APHX. On the XY its screen is a star chart: Taurus, with the controls on the stars and comets.
-- **theseus**: the DFAM-style percussion voice.
+- **toro**: the two-oscillator wavefolder synth, with APHX. On the XY its screen is a field of stacked isometric slabs whose heights are a small model of the voice.
+- **theseus**: the DFAM-style percussion voice. On the XY its screen is the kit stacked into a tower, kick to hi-hat, and the drum that's hit jumps and lights.
 - **meikyu**: the shift register as a note player (phrase mode), on SDK 1.8, the release that added players. See [What about meikyu?](#what-about-meikyu).
 
-![toro on the XY: Taurus at rest](docs/toro_rest.png)
+![toro on the XY: the field at rest, hollow cubes where the wave is quiet, the Res row lit](docs/toro_blocks_rest.png)
 
-![toro on the XY: a note at high settings, Aldebaran flaring, the sky turned, a comet](docs/toro_fold.png)
+![toro on the XY: a note, a patch of slabs pushed up with white tops](docs/toro_blocks_note.png)
 
-![theseus on the XY: front for the kick](docs/theseus_kick.png)
+![toro on the XY: Fold at 100, the field wrapped round a drum](docs/toro_blocks_fold.png)
 
-![theseus on the XY: the helmet turned to the hats, and to the cymbal](docs/theseus_hat.png)
+![theseus on the XY: the tower at rest, the floor clock under the kick](docs/theseus_tower_rest.png)
+
+![theseus on the XY: a kick, the base drum lit, rings across its head, sparks](docs/theseus_tower_kick.png)
+
+![theseus on the XY: a hat hit, the top cymbal lifted open and rocking](docs/theseus_tower_hat.png)
 
 ![the meikyu player page: the register on the labyrinth, the last phrase on the right](docs/meikyu_page.png)
 
@@ -43,28 +47,32 @@ On the XY's style guide: it says engine pages should not hold LFOs, because the 
 
 ### Screens
 
-The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored SVG and lets code move the parts, with a budget of 256 parts, 4 reshapable outlines and 16 greys. So each screen is now a `gen_panel.py` that writes the artwork (`panel.svg.fragment`) with every moving part as a separate element around its own pivot, and a `display.cpp` that places them. The geometry is lifted straight from the OP-1 sources (the same rig units, the same Bezier outlines for the bull's plate and the helmet's five heads), and anything the OP-1 drew as a chain of lines (the horns, the cowboy's legs and lasso arm, the drummer's sticks) is a chain of nodes here, each placed at the end of the one before it and turned. The composition and the per-control shapes are the OP-1's:
+The OP-1 screens drew hundreds of fresh lines per frame. The XY draws authored SVG and lets code move the parts, with a budget of 256 parts (512 from SDK 1.8), 4 reshapable outlines and 16 palette entries. So each screen is a `gen_panel.py` that writes the artwork (`panel.svg.fragment`) with every moving part as a separate element around its own origin, plus the tables `display.cpp` needs (`nodes.h`), and a `display.cpp` that places them each frame.
 
-| toro (TAURUS) | | theseus (PHALANX) | |
+Both screens were designed first, frame by frame and in motion, in my [operators](https://github.com/thoughtgrain/operators) repository (the OP-XY screen guidance I keep beside these ports), and then fitted to the device here. The drawing is a picture of what the controls do, not a panel of readouts:
+
+| toro (BLOCKS) | | theseus (TOWER) | |
 |---|---|---|---|
-| Spread | β and ζ Tauri, the horn tips, move out from the head | Decay | ripple rings from the struck head |
-| Fold | a note turns the sky about Aldebaran and it eases back, further with Fold | Punch | the kick beater winds back; a diamond on impact |
-| Cutoff | Aldebaran's magnitude, a point to a spiked blaze with a halo; a note flares it | Cutoff | the eyes burn; rays on strong hits |
-| Res | the Pleiades spin on a note and keep turning for Res; high Res tightens the cluster | FM | the crest grows, goes jagged and shakes |
-| Shape | bends the horns: the tip stars lift | Noise | sizzle specks |
-| Noise | twelve field stars twinkle while a note is held | LFO | the head slides, with motion arcs |
-| Drive | a faint wash under the Milky Way | Rate | how fast it slides |
-| Aphx | comets: each note may launch one, more often with Aphx; a rare comet crosses the idle sky on its own | Tune | moves which drum the sticks land on |
+| Spread | a second, slower wave runs across the field at the oscillator ratio; the two beat into a moiré of ridges | Decay | rings spread across the struck head: more of them, lasting longer |
+| Fold | heights fold back on themselves, and the field wraps round a drum, almost closed at 100 | Punch | how high the struck drum jumps; how far a hat hit rocks the cymbals |
+| Cutoff | low leaves the two broad waves; high adds a fine ripple of harmonics | Cutoff | how brightly the struck head fills |
+| Res | one row of tops lights, moving front to back with the setting | FM | ghost hoops thrown off the struck head (none up to 30), shimmer arcs off the hats |
+| Shape | saw to triangle: the ridges go from a sharp leading edge to symmetric | Noise | sparks off the struck head, more on the high drums |
+| Noise | a fixed jitter in every column | LFO | some hits jump higher than others, following the hit LFO |
+| Drive | the tallest columns flatten to a plateau | Rate | the floor is the LFO's clock: one dash per hit of the cycle (32 .. 2), the current one lit |
+| Aphx | each column drifts by its own amount, different for each note | Tune | shifts which tier the hits land on |
 
 Greyscale was less of a loss than I expected. The OP-1 screens already gave every control its own shape so colour was never the only cue; on the XY the shapes do all the work, with grey levels for lit against unlit.
 
-toro's screen left the bull behind. After trying the OP-1 drawing, a print style and a board of forty directions, the one that fit the XY was the oldest picture of a bull there is: the constellation. A star chart is points and hairlines on black, which is what the OLED draws best, and the controls land on real stars: Spread moves the horn tips β and ζ Tauri, Cutoff is Aldebaran's magnitude, Res spins the Pleiades at the shoulder, Fold turns the sky. Comets cross at random, more of them as Aphx rises, and one now and then on its own while the screen is idle. It is 68 nodes, and at rest only the comets move. theseus keeps its drummer in a print style (light fills, ink detail) until it gets the same treatment.
+toro's screen is a field of 70 columns, each three nodes (left face, right face, top) authored at one origin, so a column only ever slides; it never reshapes. The side faces are short slabs rather than floor-length pillars, and the columns are drawn back to front, so each slab's underside is hidden by the ones in front and the screen needs no reshapable outlines at all. Each column's height is the voice's waveform at that spot: a saw/triangle and a second wave at the Spread ratio, the harmonics Cutoff lets in, then the wavefolder, Drive's ceiling, Noise and Aphx. The quiet part of the wave is drawn hollow (black faces, a grey edge), with a fixed scatter of hollow cubes on top, so the field reads as solid and wireframe at once. A note rolls the wave forward a step, pushes a patch of six slabs up with white tops and sends a ripple across the field; all of it settles in under a second, and the idle field doesn't move. Everything per-column that the maths needs is worked out by the generator and written to `nodes.h` as Q10 tables, so `display.cpp` is integer-only; the drum Fold wraps the field round uses sinc products in Q14 so it stays exact as the bend goes to zero. 218 nodes.
+
+theseus's screen is the kit itself. One voice plays every drum, so the tower stacks the kick, floor tom, snare, rack tom and hi-hat, each drawn as the drum it plays, in line: black shapes with grey outlines, so five overlapping drums stay apart. Only the drum that's hit moves, only upward, and only its head fills. Each tier's nodes share its head's centre, so a hit is one translation; rings scale about that centre; the hat's two cymbals each turn about their own. The floor clock is drawn once for each of the ten Rate settings (121 dashes) and only the current set shows; the lit step's slice of the floor is the one reshapable outline. That made the artwork the tight part: the SDK's preview caps `panel.svg` at 64 KiB, so the path data is written compactly at one decimal, and FM's ghost hoops are one shared set thrown off whichever drum was hit last rather than a set per drum. 232 nodes.
 
 Two XY-specific things worth knowing, plus the device's own drawing rules:
 
-- **The screen doesn't know the pitch.** The XY tells a display how many notes are held and counts note starts; it doesn't say which note. On the OP-1 the engine told the screen which drum zone a hit landed in. Here theseus's screen walks a stand-in pattern (kick-heavy, like a DRM pattern, seeded by the note count) to decide which drum the sticks hit. The sound follows the real pitch; the drawing follows a plausible one. The head still turns toward the drum it draws.
-- **Paint comes from a palette.** A part painted "fill and stroke" takes both from one palette entry, so the palette has two halves: entries 0..7 a near-black fill with an outline from dim to white, 8..15 solid greys. Most parts are painted `keep` now and carry their own greys in the artwork; the palette is for the few that change (the eye highlights, the lasso, the ripple rings).
-- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device", now folded into "Artwork" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 68 nodes, theseus 143. The SDK has since added two more for authored artwork: numbers carry at most four fractional digits and no exponent, and a bound element's transform is none or `matrix(1 0 0 1 x y)`. `tools/panel_lint.py` checks all three panels against all of those rules; run it after regenerating artwork.
+- **The screen doesn't know the pitch.** The XY tells a display how many notes are held and counts note starts; it doesn't say which note. On the OP-1 the engine told the screen which drum zone a hit landed in. Here theseus's screen walks a 16-step stand-in groove (kick, hat, floor tom, hat, snare...) by the note count, shifts its zones by Tune exactly as the engine shifts a pitch's zone, and lights the nearest tier. The sound follows the real pitch; the drawing follows a plausible one. toro has the same gap, so its notes land on eight spots in turn rather than by key.
+- **Paint comes from a palette.** A part painted "fill and stroke" takes its fill, stroke and stroke width from one palette entry, so a node's look is its shade. toro's ten entries are the face greys, the lit and flash tops, and two hollow ones (black fill, grey edge); theseus's sixteen are the shell and head outlines, five fills for a struck head, and solid greys for the ribbons that draw its lines.
+- **The device is stricter than the preview.** Open-XY's PR 260 ("Drawing on the device", now folded into "Artwork" in `docs/display.md`) lists what the hardware does with artwork: every path must be one subpath of at most 64 points (compound paths stopped the device at launch), a turn within 2.5° of straight back draws a streak, points closer than 1/8 px merge, and only an authored fill is ever filled. So every figure is a **group** of single-subpath parts sharing a pivot: `gen_panel.py` assigns the node indices and writes `nodes.h`, and `display.cpp` moves a group with one call. toro is 218 nodes, theseus 232. The SDK has since added two more for authored artwork: numbers carry at most four fractional digits and no exponent, and a bound element's transform is none or `matrix(1 0 0 1 x y)`. `tools/panel_lint.py` checks all three panels against all of those rules; run it after regenerating artwork.
 
 ## Build and try
 
@@ -79,7 +87,7 @@ python tools/serve_harness.py --preview local/toro      # then open http://127.0
 
 `test` runs each machine's own sound checks (`tests/sound.cpp`: the same sweeps as the OP-1 tests, ported), builds the browser preview, checks every drawing frame against the SDK's bounds, and prints a host-timed CPU estimate. To build firmware you need the pinned Blackfin+ toolchain and your own `os.ldr`; the SDK's `docs/build.md` covers that.
 
-If you change the artwork, regenerate it: `python3 gen_panel.py` in toro's or theseus's folder (it writes `panel.svg.fragment`, `nodes.h` and the node count into `definition.json`), `python3 gen_panel.py > panel.svg.fragment` in meikyu's; then `python3 tools/panel_lint.py machines/*/panel.svg.fragment`.
+If you change the artwork, regenerate it: `python3 gen_panel.py` in toro's or theseus's folder (it writes `panel.svg.fragment`, `nodes.h` and the display block in `definition.json`), `python3 gen_panel.py > panel.svg.fragment` in meikyu's; then `python3 tools/panel_lint.py machines/*/panel.svg.fragment`.
 
 ## Status
 
